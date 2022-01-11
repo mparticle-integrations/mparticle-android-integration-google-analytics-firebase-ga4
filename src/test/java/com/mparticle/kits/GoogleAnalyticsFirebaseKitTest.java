@@ -112,6 +112,42 @@ public class GoogleAnalyticsFirebaseKitTest {
     }
 
     @Test
+    public void testShippingInfoCommerceEvent() {
+        CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
+                .addCustomFlag("GA4.CommerceEventType", FirebaseAnalytics.Event.ADD_SHIPPING_INFO)
+                .addCustomFlag("GA4.ShippingTier", "overnight")
+                .build();
+        kitInstance.logEvent(event);
+
+        assertEquals(1, firebaseSdk.getLoggedEvents().size());
+        assertEquals("add_shipping_info", firebaseSdk.getLoggedEvents().get(0).getKey());
+        assertEquals("overnight", firebaseSdk.getLoggedEvents().get(0).getValue().getString("shipping_tier"));
+    }
+
+    @Test
+    public void testPaymentInfoCommerceEvent() {
+        CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
+                .addCustomFlag("GA4.CommerceEventType", FirebaseAnalytics.Event.ADD_PAYMENT_INFO)
+                .addCustomFlag("GA4.PaymentType", "visa")
+                .build();
+        kitInstance.logEvent(event);
+
+        assertEquals(1, firebaseSdk.getLoggedEvents().size());
+        assertEquals("add_payment_info", firebaseSdk.getLoggedEvents().get(0).getKey());
+        assertEquals("visa", firebaseSdk.getLoggedEvents().get(0).getValue().getString("payment_type"));
+    }
+
+    @Test
+    public void testCheckoutOptionCommerceEvent() {
+        CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
+                .build();
+        kitInstance.logEvent(event);
+
+        assertEquals(1, firebaseSdk.getLoggedEvents().size());
+        assertEquals("set_checkout_option", firebaseSdk.getLoggedEvents().get(0).getKey());
+    }
+
+    @Test
     public void testCommerceEvent() throws IllegalAccessException {
         for (Field field: Product.class.getFields()) {
             if (Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
