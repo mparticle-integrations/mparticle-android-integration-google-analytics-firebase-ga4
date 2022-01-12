@@ -40,8 +40,8 @@ import static junit.framework.TestCase.assertTrue;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public class GoogleAnalyticsFirebaseKitTest {
-    GoogleAnalyticsFirebaseKit kitInstance;
+public class GoogleAnalyticsFirebaseGA4KitTest {
+    GoogleAnalyticsFirebaseGA4Kit kitInstance;
     FirebaseAnalytics firebaseSdk;
     Random random = new Random();
 
@@ -49,7 +49,7 @@ public class GoogleAnalyticsFirebaseKitTest {
     public void before() throws JSONException {
         FirebaseAnalytics.clearInstance();
         FirebaseAnalytics.setFirebaseId("firebaseId");
-        kitInstance = new GoogleAnalyticsFirebaseKit();
+        kitInstance = new GoogleAnalyticsFirebaseGA4Kit();
         MParticle.setInstance(Mockito.mock(MParticle.class));
         Mockito.when(MParticle.getInstance().Identity()).thenReturn(Mockito.mock(IdentityApi.class));
         KitManagerImpl kitManager = new KitManagerImpl(Mockito.mock(Context.class), null, emptyCoreCallbacks,  new BackgroundTaskHandler() {
@@ -114,8 +114,8 @@ public class GoogleAnalyticsFirebaseKitTest {
     @Test
     public void testShippingInfoCommerceEvent() {
         CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
-                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4COMMERCE_EVENT_TYPE, FirebaseAnalytics.Event.ADD_SHIPPING_INFO)
-                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4_SHIPPING_TIER, "overnight")
+                .addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4COMMERCE_EVENT_TYPE, FirebaseAnalytics.Event.ADD_SHIPPING_INFO)
+                .addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4_SHIPPING_TIER, "overnight")
                 .build();
         kitInstance.logEvent(event);
 
@@ -127,8 +127,8 @@ public class GoogleAnalyticsFirebaseKitTest {
     @Test
     public void testPaymentInfoCommerceEvent() {
         CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
-                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4COMMERCE_EVENT_TYPE, FirebaseAnalytics.Event.ADD_PAYMENT_INFO)
-                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4_PAYMENT_TYPE, "visa")
+                .addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4COMMERCE_EVENT_TYPE, FirebaseAnalytics.Event.ADD_PAYMENT_INFO)
+                .addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4_PAYMENT_TYPE, "visa")
                 .build();
         kitInstance.logEvent(event);
 
