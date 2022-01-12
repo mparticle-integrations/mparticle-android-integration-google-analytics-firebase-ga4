@@ -114,8 +114,8 @@ public class GoogleAnalyticsFirebaseKitTest {
     @Test
     public void testShippingInfoCommerceEvent() {
         CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
-                .addCustomFlag("GA4.CommerceEventType", FirebaseAnalytics.Event.ADD_SHIPPING_INFO)
-                .addCustomFlag("GA4.ShippingTier", "overnight")
+                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4COMMERCE_EVENT_TYPE, FirebaseAnalytics.Event.ADD_SHIPPING_INFO)
+                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4_SHIPPING_TIER, "overnight")
                 .build();
         kitInstance.logEvent(event);
 
@@ -127,8 +127,8 @@ public class GoogleAnalyticsFirebaseKitTest {
     @Test
     public void testPaymentInfoCommerceEvent() {
         CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
-                .addCustomFlag("GA4.CommerceEventType", FirebaseAnalytics.Event.ADD_PAYMENT_INFO)
-                .addCustomFlag("GA4.PaymentType", "visa")
+                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4COMMERCE_EVENT_TYPE, FirebaseAnalytics.Event.ADD_PAYMENT_INFO)
+                .addCustomFlag(GoogleAnalyticsFirebaseKit.CF_GA4_PAYMENT_TYPE, "visa")
                 .build();
         kitInstance.logEvent(event);
 
