@@ -35,9 +35,9 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
     final static String USER_ID_EMAIL_VALUE = "email";
     final static String USER_ID_MPID_VALUE = "mpid";
 
-    final static String CF_GA4COMMERCE_EVENT_TYPE = "GA4.CommerceEventType";
-    final static String CF_GA4_PAYMENT_TYPE = "GA4.PaymentType";
-    final static String CF_GA4_SHIPPING_TIER = "GA4.ShippingTier";
+    public final static String CF_GA4COMMERCE_EVENT_TYPE = "GA4.CommerceEventType";
+    public final static String CF_GA4_PAYMENT_TYPE = "GA4.PaymentType";
+    public final static String CF_GA4_SHIPPING_TIER = "GA4.ShippingTier";
 
     private static String[] forbiddenPrefixes = new String[]{"google_", "firebase_", "ga_"};
     private static int eventMaxLength = 40;
