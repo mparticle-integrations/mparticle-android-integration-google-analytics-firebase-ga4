@@ -129,7 +129,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
                 eventName = FirebaseAnalytics.Event.REMOVE_FROM_CART;
                 break;
             case Product.CLICK:
-                eventName = FirebaseAnalytics.Event.SELECT_CONTENT;
+                eventName = FirebaseAnalytics.Event.SELECT_ITEM;
                 break;
             case Product.CHECKOUT_OPTION:
                 Map<String, List<String>> customFlags = commerceEvent.getCustomFlags();
