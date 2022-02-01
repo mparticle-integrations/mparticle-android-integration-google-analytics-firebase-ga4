@@ -12,6 +12,8 @@ import com.mparticle.MPEvent;
 import com.mparticle.MParticle;
 import com.mparticle.commerce.CommerceEvent;
 import com.mparticle.commerce.Product;
+import com.mparticle.commerce.Promotion;
+import com.mparticle.commerce.Impression;
 import com.mparticle.commerce.TransactionAttributes;
 import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
@@ -104,65 +106,88 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
     public List<ReportingMessage> logEvent(CommerceEvent commerceEvent) {
         FirebaseAnalytics instance = FirebaseAnalytics.getInstance(getContext());
         String eventName;
-        if (commerceEvent == null || commerceEvent.getProductAction() == null) {
+        Bundle bundle;
+        if (commerceEvent == null) {
             return null;
         }
-        Bundle bundle = getCommerceEventBundle(commerceEvent)
-        .getBundle();
-        switch (commerceEvent.getProductAction()) {
-            case Product.ADD_TO_CART:
-                eventName = FirebaseAnalytics.Event.ADD_TO_CART;
-                break;
-            case Product.ADD_TO_WISHLIST:
-                eventName = FirebaseAnalytics.Event.ADD_TO_WISHLIST;
-                break;
-            case Product.CHECKOUT:
-                eventName = FirebaseAnalytics.Event.BEGIN_CHECKOUT;
-                break;
-            case Product.PURCHASE:
-                eventName = FirebaseAnalytics.Event.PURCHASE;
-                break;
-            case Product.REFUND:
-                eventName = FirebaseAnalytics.Event.REFUND;
-                break;
-            case Product.REMOVE_FROM_CART:
-                eventName = FirebaseAnalytics.Event.REMOVE_FROM_CART;
-                break;
-            case Product.CLICK:
-                eventName = FirebaseAnalytics.Event.SELECT_ITEM;
-                break;
-            case Product.CHECKOUT_OPTION:
-                Map<String, List<String>> customFlags = commerceEvent.getCustomFlags();
-                if (customFlags != null && customFlags.containsKey(CF_GA4COMMERCE_EVENT_TYPE)) {
-                    List<String> commerceEventTypes = customFlags.get(CF_GA4COMMERCE_EVENT_TYPE);
-                    if (!commerceEventTypes.isEmpty()) {
-                        String commerceEventType = commerceEventTypes.get(0);
-                        if (commerceEventType.equals(FirebaseAnalytics.Event.ADD_SHIPPING_INFO.toString())) {
-                            eventName = FirebaseAnalytics.Event.ADD_SHIPPING_INFO;
-                        } else if (commerceEventType.equals(FirebaseAnalytics.Event.ADD_PAYMENT_INFO.toString())) {
-                            eventName = FirebaseAnalytics.Event.ADD_PAYMENT_INFO;
+
+        if (commerceEvent.getPromotionAction() != null) {
+            if (commerceEvent.getPromotionAction() == Promotion.CLICK) {
+                eventName = FirebaseAnalytics.Event.SELECT_PROMOTION;
+            } else {
+                eventName = FirebaseAnalytics.Event.VIEW_PROMOTION;
+            }
+            for (Promotion promotion : commerceEvent.getPromotions()) {
+                bundle = getPromotionCommerceEventBundle(promotion).getBundle();
+    
+                instance.logEvent(eventName, bundle);
+            }
+        } else if (commerceEvent.getImpressions() != null) {
+            eventName = FirebaseAnalytics.Event.VIEW_ITEM_LIST;
+            for (Impression impression : commerceEvent.getImpressions()) {
+                bundle = getImpressionCommerceEventBundle(impression.getListName(), impression.getProducts()).getBundle();
+            
+                instance.logEvent(eventName, bundle);
+            }
+        } else if (commerceEvent.getProductAction() != null) {
+            bundle = getCommerceEventBundle(commerceEvent).getBundle();
+            switch (commerceEvent.getProductAction()) {
+                case Product.ADD_TO_CART:
+                    eventName = FirebaseAnalytics.Event.ADD_TO_CART;
+                    break;
+                case Product.ADD_TO_WISHLIST:
+                    eventName = FirebaseAnalytics.Event.ADD_TO_WISHLIST;
+                    break;
+                case Product.CHECKOUT:
+                    eventName = FirebaseAnalytics.Event.BEGIN_CHECKOUT;
+                    break;
+                case Product.PURCHASE:
+                    eventName = FirebaseAnalytics.Event.PURCHASE;
+                    break;
+                case Product.REFUND:
+                    eventName = FirebaseAnalytics.Event.REFUND;
+                    break;
+                case Product.REMOVE_FROM_CART:
+                    eventName = FirebaseAnalytics.Event.REMOVE_FROM_CART;
+                    break;
+                case Product.CLICK:
+                    eventName = FirebaseAnalytics.Event.SELECT_ITEM;
+                    break;
+                case Product.CHECKOUT_OPTION:
+                    Map<String, List<String>> customFlags = commerceEvent.getCustomFlags();
+                    if (customFlags != null && customFlags.containsKey(CF_GA4COMMERCE_EVENT_TYPE)) {
+                        List<String> commerceEventTypes = customFlags.get(CF_GA4COMMERCE_EVENT_TYPE);
+                        if (!commerceEventTypes.isEmpty()) {
+                            String commerceEventType = commerceEventTypes.get(0);
+                            if (commerceEventType.equals(FirebaseAnalytics.Event.ADD_SHIPPING_INFO.toString())) {
+                                eventName = FirebaseAnalytics.Event.ADD_SHIPPING_INFO;
+                            } else if (commerceEventType.equals(FirebaseAnalytics.Event.ADD_PAYMENT_INFO.toString())) {
+                                eventName = FirebaseAnalytics.Event.ADD_PAYMENT_INFO;
+                            } else {
+                                Logger.warning("You used an unsupported value for the custom flag 'GA4.CommerceEventType'. Please review the mParticle documentation. The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
+                                eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
+                            }
                         } else {
-                            Logger.warning("You used an unsupported value for the custom flag 'GA4.CommerceEventType'. Please review the mParticle documentation. The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
+                            Logger.warning("Setting a CHECKOUT_OPTION now requires a custom flag of 'GA4.CommerceEventType'. Please review the mParticle documentation.  The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
                             eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
                         }
                     } else {
                         Logger.warning("Setting a CHECKOUT_OPTION now requires a custom flag of 'GA4.CommerceEventType'. Please review the mParticle documentation.  The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
                         eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
                     }
-                } else {
-                    Logger.warning("Setting a CHECKOUT_OPTION now requires a custom flag of 'GA4.CommerceEventType'. Please review the mParticle documentation.  The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
-                    eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
-                }
 
-                break;
-            case Product.DETAIL:
-                eventName = FirebaseAnalytics.Event.VIEW_ITEM;
-                break;
-            default:
-                return null;
+                    break;
+                case Product.DETAIL:
+                    eventName = FirebaseAnalytics.Event.VIEW_ITEM;
+                    break;
+                default:
+                    return null;
+            }
+        instance.logEvent(eventName, bundle);
+        } else {
+            return null;
         }
 
-        instance.logEvent(eventName, bundle);
         return Collections.singletonList(ReportingMessage.fromEvent(this, commerceEvent));
     }
 
@@ -227,6 +252,26 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
         return bundle;
     }
 
+    PickyBundle getPromotionCommerceEventBundle(Promotion promotion) {
+        PickyBundle pickyBundle = new PickyBundle();
+
+        if (promotion == null) {
+            return pickyBundle;
+        }
+        return new PickyBundle()
+                .putString(FirebaseAnalytics.Param.PROMOTION_ID, promotion.getId())
+                .putString(FirebaseAnalytics.Param.CREATIVE_NAME, promotion.getCreative())
+                .putString(FirebaseAnalytics.Param.PROMOTION_NAME, promotion.getName())
+                .putString(FirebaseAnalytics.Param.CREATIVE_SLOT, promotion.getPosition());
+    }
+
+    PickyBundle getImpressionCommerceEventBundle(String impressionKey, List<Product> products) {
+        return new PickyBundle()
+                .putString(FirebaseAnalytics.Param.ITEM_LIST_ID, impressionKey)
+                .putString(FirebaseAnalytics.Param.ITEM_LIST_NAME, impressionKey)
+                .putBundleList(FirebaseAnalytics.Param.ITEMS, getProductBundles(products));
+    }
+
     PickyBundle getCommerceEventBundle(CommerceEvent commerceEvent) {
         PickyBundle pickyBundle = getTransactionAttributesBundle(commerceEvent);
         String currency = commerceEvent.getCurrency();
@@ -264,12 +309,15 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     Bundle[] getProductBundles(CommerceEvent commerceEvent) {
         List<Product> products = commerceEvent.getProducts();
+        return getProductBundles(products);
+    }
+
+    Bundle[] getProductBundles(List<Product> products) {
         if (products != null) {
             Bundle[] bundles = new Bundle[products.size()];
             int i = 0;
             for (Product product: products) {
-                PickyBundle bundle = getBundle(product)
-                        .putString(FirebaseAnalytics.Param.CURRENCY, commerceEvent.getCurrency());
+                PickyBundle bundle = getBundle(product);
                 bundles[i] = bundle.getBundle();
                 i++;
             }
