@@ -96,9 +96,6 @@ public class GoogleAnalyticsFirebaseGA4KitTest {
         }
     }
 
-    /**
-     * shouldn't do anything, just don't crash
-     */
     @Test
     public void testPromotionCommerceEvent() {
         Promotion promotion = new Promotion();
@@ -108,7 +105,7 @@ public class GoogleAnalyticsFirebaseGA4KitTest {
         promotion.setPosition("2");
         CommerceEvent event = new CommerceEvent.Builder(Promotion.CLICK, promotion).build();
         kitInstance.logEvent(event);
-        assertEquals(0, firebaseSdk.getLoggedEvents().size());
+        assertEquals(1, firebaseSdk.getLoggedEvents().size());
     }
 
     @Test
