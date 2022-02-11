@@ -34,19 +34,18 @@ import java.util.Set;
 public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements KitIntegration.EventListener, KitIntegration.IdentityListener, KitIntegration.CommerceListener, KitIntegration.UserAttributeListener {
     final static String SHOULD_HASH_USER_ID = "hashUserId";
     final static String EXTERNAL_USER_IDENTITY_TYPE = "externalUserIdentityType";
-    final static String EXTERNAL_USER_IDENTITY_CUSTOMER_ID = "customerId";
-    final static String EXTERNAL_USER_IDENTITY_EMAIL = "email";
+    final static String EXTERNAL_USER_IDENTITY_CUSTOMER_ID = "CustomerId";
     final static String EXTERNAL_USER_IDENTITY_MPID = "mpid";
-    final static String EXTERNAL_USER_IDENTITY_OTHER = "other";
-    final static String EXTERNAL_USER_IDENTITY_OTHER2 = "other2";
-    final static String EXTERNAL_USER_IDENTITY_OTHER3 = "other3";
-    final static String EXTERNAL_USER_IDENTITY_OTHER4 = "other4";
-    final static String EXTERNAL_USER_IDENTITY_OTHER5 = "other5";
-    final static String EXTERNAL_USER_IDENTITY_OTHER6 = "other6";
-    final static String EXTERNAL_USER_IDENTITY_OTHER7 = "other7";
-    final static String EXTERNAL_USER_IDENTITY_OTHER8 = "other8";
-    final static String EXTERNAL_USER_IDENTITY_OTHER9 = "other9";
-    final static String EXTERNAL_USER_IDENTITY_OTHER10 = "other10";
+    final static String EXTERNAL_USER_IDENTITY_OTHER = "Other";
+    final static String EXTERNAL_USER_IDENTITY_OTHER2 = "Other2";
+    final static String EXTERNAL_USER_IDENTITY_OTHER3 = "Other3";
+    final static String EXTERNAL_USER_IDENTITY_OTHER4 = "Other4";
+    final static String EXTERNAL_USER_IDENTITY_OTHER5 = "Other5";
+    final static String EXTERNAL_USER_IDENTITY_OTHER6 = "Other6";
+    final static String EXTERNAL_USER_IDENTITY_OTHER7 = "Other7";
+    final static String EXTERNAL_USER_IDENTITY_OTHER8 = "Other8";
+    final static String EXTERNAL_USER_IDENTITY_OTHER9 = "Other9";
+    final static String EXTERNAL_USER_IDENTITY_OTHER10 = "Other10";
 
     public final static String CF_GA4COMMERCE_EVENT_TYPE = "GA4.CommerceEventType";
     public final static String CF_GA4_PAYMENT_TYPE = "GA4.PaymentType";
@@ -228,8 +227,6 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
         if (user != null) {
             if (EXTERNAL_USER_IDENTITY_CUSTOMER_ID.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
                 userId = user.getUserIdentities().get(MParticle.IdentityType.CustomerId);
-            } else if (EXTERNAL_USER_IDENTITY_EMAIL.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
-                userId = user.getUserIdentities().get(MParticle.IdentityType.Email);
             } else if (EXTERNAL_USER_IDENTITY_MPID.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
                 userId = Long.toString(user.getId());
             } else if (EXTERNAL_USER_IDENTITY_OTHER.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
