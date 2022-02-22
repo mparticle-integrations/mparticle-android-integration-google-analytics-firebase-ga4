@@ -19,6 +19,7 @@ import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
 import com.mparticle.internal.Logger;
 import com.mparticle.internal.MPUtility;
+import com.mparticle.kits.KitUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -32,10 +33,20 @@ import java.util.Map;
 import java.util.Set;
 
 public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements KitIntegration.EventListener, KitIntegration.IdentityListener, KitIntegration.CommerceListener, KitIntegration.UserAttributeListener {
-    final static String USER_ID_FIELD_KEY = "userIdField";
-    final static String USER_ID_CUSTOMER_ID_VALUE = "customerId";
-    final static String USER_ID_EMAIL_VALUE = "email";
-    final static String USER_ID_MPID_VALUE = "mpid";
+    final static String SHOULD_HASH_USER_ID = "hashUserId";
+    final static String EXTERNAL_USER_IDENTITY_TYPE = "externalUserIdentityType";
+    final static String EXTERNAL_USER_IDENTITY_CUSTOMER_ID = "CustomerId";
+    final static String EXTERNAL_USER_IDENTITY_MPID = "mpid";
+    final static String EXTERNAL_USER_IDENTITY_OTHER = "Other";
+    final static String EXTERNAL_USER_IDENTITY_OTHER2 = "Other2";
+    final static String EXTERNAL_USER_IDENTITY_OTHER3 = "Other3";
+    final static String EXTERNAL_USER_IDENTITY_OTHER4 = "Other4";
+    final static String EXTERNAL_USER_IDENTITY_OTHER5 = "Other5";
+    final static String EXTERNAL_USER_IDENTITY_OTHER6 = "Other6";
+    final static String EXTERNAL_USER_IDENTITY_OTHER7 = "Other7";
+    final static String EXTERNAL_USER_IDENTITY_OTHER8 = "Other8";
+    final static String EXTERNAL_USER_IDENTITY_OTHER9 = "Other9";
+    final static String EXTERNAL_USER_IDENTITY_OTHER10 = "Other10";
 
     public final static String CF_GA4COMMERCE_EVENT_TYPE = "GA4.CommerceEventType";
     public final static String CF_GA4_PAYMENT_TYPE = "GA4.PaymentType";
@@ -213,20 +224,44 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     @Override
     public void onUserIdentified(MParticleUser mParticleUser) {
-
+        setUserId(mParticleUser);
     }
 
     private void setUserId(MParticleUser user) {
         String userId = null;
-        if (USER_ID_CUSTOMER_ID_VALUE.equalsIgnoreCase(getSettings().get(USER_ID_FIELD_KEY))) {
-            userId = user.getUserIdentities().get(MParticle.IdentityType.CustomerId);
-        } else if (USER_ID_EMAIL_VALUE.equalsIgnoreCase(getSettings().get(USER_ID_FIELD_KEY))) {
-            userId = user.getUserIdentities().get(MParticle.IdentityType.Email);
-        } else if (user != null && USER_ID_MPID_VALUE.equalsIgnoreCase(getSettings().get(USER_ID_FIELD_KEY))) {
-            userId = Long.toString(user.getId());
-        }
-        if (!KitUtils.isEmpty(userId)) {
-            FirebaseAnalytics.getInstance(getContext()).setUserId(userId);
+        if (user != null) {
+            if (EXTERNAL_USER_IDENTITY_CUSTOMER_ID.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.CustomerId);
+            } else if (EXTERNAL_USER_IDENTITY_MPID.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = Long.toString(user.getId());
+            } else if (EXTERNAL_USER_IDENTITY_OTHER.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER2.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other2);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER3.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other3);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER4.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other4);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER5.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other5);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER6.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other6);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER7.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other7);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER8.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other8);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER9.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other9);
+            } else if (EXTERNAL_USER_IDENTITY_OTHER10.equalsIgnoreCase(getSettings().get(EXTERNAL_USER_IDENTITY_TYPE))) {
+                userId = user.getUserIdentities().get(MParticle.IdentityType.Other10);
+            }
+
+            if (!KitUtils.isEmpty(userId)) {
+                if ("true".equalsIgnoreCase(getSettings().get(SHOULD_HASH_USER_ID))) {
+                    userId = KitUtils.hashFnv1a(userId.getBytes()).toString();
+                }
+                FirebaseAnalytics.getInstance(getContext()).setUserId(userId);
+            }
         }
     }
 
