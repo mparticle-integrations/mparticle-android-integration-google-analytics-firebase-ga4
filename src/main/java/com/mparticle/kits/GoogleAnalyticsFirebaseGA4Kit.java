@@ -19,6 +19,7 @@ import com.mparticle.consent.ConsentState;
 import com.mparticle.identity.MParticleUser;
 import com.mparticle.internal.Logger;
 import com.mparticle.internal.MPUtility;
+import com.mparticle.kits.KitUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -203,18 +204,22 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     @Override
     public void onIdentifyCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
+        setUserId(mParticleUser);
     }
 
     @Override
     public void onLoginCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
+        setUserId(mParticleUser);
     }
 
     @Override
     public void onLogoutCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
+        setUserId(mParticleUser);
     }
 
     @Override
     public void onModifyCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
+        setUserId(mParticleUser);
     }
 
     @Override
@@ -253,7 +258,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
             if (!KitUtils.isEmpty(userId)) {
                 if ("true".equalsIgnoreCase(getSettings().get(SHOULD_HASH_USER_ID))) {
-                    //userId = Long.toString(MPUtility.hashFnv1A(userId.getBytes().longValue()));
+                    userId = KitUtils.hashFnv1a(userId.getBytes()).toString();
                 }
                 FirebaseAnalytics.getInstance(getContext()).setUserId(userId);
             }
