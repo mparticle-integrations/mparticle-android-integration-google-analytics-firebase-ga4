@@ -32,8 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+
 public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements KitIntegration.EventListener, KitIntegration.IdentityListener, KitIntegration.CommerceListener, KitIntegration.UserAttributeListener {
     final static String SHOULD_HASH_USER_ID = "hashUserId";
+    final static String FORWARD_REQUESTS_SERVER_SIDE = "forwardWebRequestsServerSide";
     final static String EXTERNAL_USER_IDENTITY_TYPE = "externalUserIdentityType";
     final static String EXTERNAL_USER_IDENTITY_CUSTOMER_ID = "CustomerId";
     final static String EXTERNAL_USER_IDENTITY_MPID = "mpid";
@@ -52,6 +60,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
     public final static String CF_GA4_PAYMENT_TYPE = "GA4.PaymentType";
     public final static String CF_GA4_SHIPPING_TIER = "GA4.ShippingTier";
 
+    private static String instanceIdIntegrationKey = "app_instance_id";
     private static String[] forbiddenPrefixes = new String[]{"google_", "firebase_", "ga_"};
     private static int eventMaxLength = 40;
     private static int userAttributeMaxLength = 24;
@@ -67,6 +76,9 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
     @Override
     protected List<ReportingMessage> onKitCreate(Map<String, String> map, Context context) throws IllegalArgumentException {
         Logger.info(getName() + " Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work");
+        if (forwardRequestsServerSide()) {
+            updateInstanceIDIntegration();
+        }
         return null;
     }
 
@@ -92,6 +104,10 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     @Override
     public List<ReportingMessage> logEvent(MPEvent mpEvent) {
+        if (forwardRequestsServerSide()) {
+            return null;
+        }
+
         FirebaseAnalytics.getInstance(getContext())
                 .logEvent(getFirebaseEventName(mpEvent), toBundle(mpEvent.getInfo()));
 
@@ -100,6 +116,10 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     @Override
     public List<ReportingMessage> logScreen(String s, Map<String, String> map) {
+        if (forwardRequestsServerSide()) {
+            return null;
+        }
+
         Activity activity = getCurrentActivity().get();
         if (activity != null) {
             FirebaseAnalytics.getInstance(getContext()).setCurrentScreen(activity, standardizeName(s, true), null);
@@ -115,6 +135,10 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     @Override
     public List<ReportingMessage> logEvent(CommerceEvent commerceEvent) {
+        if (forwardRequestsServerSide()) {
+            return null;
+        }
+
         FirebaseAnalytics instance = FirebaseAnalytics.getInstance(getContext());
         String eventName;
         Bundle bundle;
@@ -204,27 +228,59 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
     @Override
     public void onIdentifyCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
-        setUserId(mParticleUser);
+        if (!forwardRequestsServerSide()) {
+            setUserId(mParticleUser);
+        }
     }
 
     @Override
     public void onLoginCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
-        setUserId(mParticleUser);
+        if (!forwardRequestsServerSide()) {
+            setUserId(mParticleUser);
+        }
     }
 
     @Override
     public void onLogoutCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
-        setUserId(mParticleUser);
+        if (!forwardRequestsServerSide()) {
+            setUserId(mParticleUser);
+        }
     }
 
     @Override
     public void onModifyCompleted(MParticleUser mParticleUser, FilteredIdentityApiRequest filteredIdentityApiRequest) {
-        setUserId(mParticleUser);
+        if (!forwardRequestsServerSide()) {
+            setUserId(mParticleUser);
+        }
     }
 
     @Override
     public void onUserIdentified(MParticleUser mParticleUser) {
-        setUserId(mParticleUser);
+        if (!forwardRequestsServerSide()) {
+            setUserId(mParticleUser);
+        }
+    }
+
+    private boolean forwardRequestsServerSide() {
+        return !KitUtils.isEmpty(getSettings().get(FORWARD_REQUESTS_SERVER_SIDE));
+    }
+
+    /**
+     * Sets the GA4 Instance ID as an mParticle integration attribute.
+     */
+    private void updateInstanceIDIntegration() {
+        FirebaseAnalytics instance = FirebaseAnalytics.getInstance(getContext());
+        Task<String> task = instance.getAppInstanceId();
+        task.addOnSuccessListener(new OnSuccessListener<String>() {
+            @Override
+            public void onSuccess(String appInstanceID) {
+                if (!KitUtils.isEmpty(appInstanceID)) {
+                    HashMap<String, String> integrationAttributes = new HashMap<String, String>(1);
+                    integrationAttributes.put(instanceIdIntegrationKey, appInstanceID);
+                    setIntegrationAttributes(integrationAttributes);
+                }
+            }
+        });
     }
 
     private void setUserId(MParticleUser user) {
