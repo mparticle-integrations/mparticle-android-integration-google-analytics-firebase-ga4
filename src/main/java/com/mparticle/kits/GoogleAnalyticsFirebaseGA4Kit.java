@@ -247,7 +247,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
     }
 
     private boolean forwardRequestsServerSide() {
-        return !KitUtils.isEmpty(getSettings().get(FORWARD_REQUESTS_SERVER_SIDE));
+        return "true".equalsIgnoreCase(getSettings().get(FORWARD_REQUESTS_SERVER_SIDE));
     }
 
     /**
