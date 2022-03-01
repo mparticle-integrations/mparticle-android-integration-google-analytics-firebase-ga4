@@ -1,6 +1,6 @@
 ## Firebase for Google Analytics 4 (GA4) Kit Integration
 
-This repository contains the [Firebase for GA4](https://firebase.google.com/docs/analytics/get-started?platform=ios) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
+This repository contains the [Firebase for GA4](https://firebase.google.com/docs/analytics/get-started?platform=android) integration for the [mParticle Android SDK](https://github.com/mParticle/mparticle-android-sdk).
 
 ### Adding the integration
 
