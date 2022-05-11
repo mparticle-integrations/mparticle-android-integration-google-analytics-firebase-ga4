@@ -19,6 +19,7 @@ import com.mparticle.identity.MParticleUser;
 import com.mparticle.internal.Logger;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -174,28 +175,28 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
                     eventName = FirebaseAnalytics.Event.SELECT_ITEM;
                     break;
                 case Product.CHECKOUT_OPTION:
+                    String warningMessage = "GA4 no longer supports CHECKOUT_OPTION. To specify a different eventName, add CF_GA4COMMERCE_EVENT_TYPE to your customFlags with a valid value";
                     Map<String, List<String>> customFlags = commerceEvent.getCustomFlags();
                     if (customFlags != null && customFlags.containsKey(CF_GA4COMMERCE_EVENT_TYPE)) {
                         List<String> commerceEventTypes = customFlags.get(CF_GA4COMMERCE_EVENT_TYPE);
-                        if (!commerceEventTypes.isEmpty()) {
+                        if (commerceEventTypes != null && !commerceEventTypes.isEmpty()) {
                             String commerceEventType = commerceEventTypes.get(0);
                             if (commerceEventType.equals(FirebaseAnalytics.Event.ADD_SHIPPING_INFO.toString())) {
                                 eventName = FirebaseAnalytics.Event.ADD_SHIPPING_INFO;
                             } else if (commerceEventType.equals(FirebaseAnalytics.Event.ADD_PAYMENT_INFO.toString())) {
                                 eventName = FirebaseAnalytics.Event.ADD_PAYMENT_INFO;
                             } else {
-                                Logger.warning("You used an unsupported value for the custom flag 'GA4.CommerceEventType'. Please review the mParticle documentation. The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
-                                eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
+                                Logger.warning(warningMessage);
+                                return null;
                             }
                         } else {
-                            Logger.warning("Setting a CHECKOUT_OPTION now requires a custom flag of 'GA4.CommerceEventType'. Please review the mParticle documentation.  The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
-                            eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
+                            Logger.warning(warningMessage);
+                            return null;
                         }
                     } else {
-                        Logger.warning("Setting a CHECKOUT_OPTION now requires a custom flag of 'GA4.CommerceEventType'. Please review the mParticle documentation.  The event will be sent to Firebase with the deprecated SET_CHECKOUT_OPTION event type.");
-                        eventName = FirebaseAnalytics.Event.SET_CHECKOUT_OPTION;
+                        Logger.warning(warningMessage);
+                        return null;
                     }
-
                     break;
                 case Product.DETAIL:
                     eventName = FirebaseAnalytics.Event.VIEW_ITEM;
@@ -203,7 +204,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
                 default:
                     return null;
             }
-        instance.logEvent(eventName, bundle);
+            instance.logEvent(eventName, bundle);
         } else {
             return null;
         }
@@ -378,9 +379,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
         }
         return pickyBundle
                 .putString(FirebaseAnalytics.Param.CURRENCY, currency)
-                .putBundleList(FirebaseAnalytics.Param.ITEMS, getProductBundles(commerceEvent))
-                .putString(FirebaseAnalytics.Event.SET_CHECKOUT_OPTION, commerceEvent.getCheckoutOptions())
-                .putInt(FirebaseAnalytics.Event.CHECKOUT_PROGRESS, commerceEvent.getCheckoutStep());
+                .putBundleList(FirebaseAnalytics.Param.ITEMS, getProductBundles(commerceEvent));
     }
 
     Bundle[] getProductBundles(CommerceEvent commerceEvent) {
@@ -541,7 +540,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
         return name;
     }
 
-    class PickyBundle {
+    static class PickyBundle {
         private Bundle bundle = new Bundle();
 
         PickyBundle putString(String key, String value) {

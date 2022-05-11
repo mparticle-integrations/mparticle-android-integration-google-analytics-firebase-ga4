@@ -27,6 +27,7 @@ import org.mockito.Mockito;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -132,12 +133,17 @@ public class GoogleAnalyticsFirebaseGA4KitTest {
 
     @Test
     public void testCheckoutOptionCommerceEvent() {
-        CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
-                .build();
-        kitInstance.logEvent(event);
+        String[] customEventTypes = new String[]{FirebaseAnalytics.Event.ADD_PAYMENT_INFO, FirebaseAnalytics.Event.ADD_SHIPPING_INFO};
+        for (String customEventType: customEventTypes) {
+            CommerceEvent event = new CommerceEvent.Builder(Product.CHECKOUT_OPTION, new Product.Builder("asdv", "asdv", 1.3).build())
+                    .addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4COMMERCE_EVENT_TYPE, customEventType)
+                    .build();
+            kitInstance.logEvent(event);
 
-        assertEquals(1, firebaseSdk.getLoggedEvents().size());
-        assertEquals("set_checkout_option", firebaseSdk.getLoggedEvents().get(0).getKey());
+            assertEquals(1, firebaseSdk.getLoggedEvents().size());
+            assertEquals(customEventType, firebaseSdk.getLoggedEvents().get(0).getKey());
+            firebaseSdk.clearLoggedEvents();
+        }
     }
 
     @Test
@@ -146,7 +152,7 @@ public class GoogleAnalyticsFirebaseGA4KitTest {
             if (Modifier.isPublic(field.getModifiers()) && Modifier.isStatic(field.getModifiers())) {
                 firebaseSdk.clearLoggedEvents();
                 String eventType = field.get(null).toString();
-                if (!eventType.equals("remove_from_wishlist")) {
+                if (!eventType.equals("remove_from_wishlist") && !eventType.equals("checkout_option")) {
                     CommerceEvent event = new CommerceEvent.Builder(eventType, new Product.Builder("asdv", "asdv", 1.3).build())
                             .transactionAttributes(new TransactionAttributes().setId("235").setRevenue(23.3).setAffiliation("231"))
                             .build();
