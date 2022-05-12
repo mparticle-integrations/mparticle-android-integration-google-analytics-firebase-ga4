@@ -82,9 +82,9 @@ public class GoogleAnalyticsFirebaseGA4KitTest {
             } else {
                 assertEquals("search", firebaseEvent.getKey());
             }
-            if (event.getInfo() != null) {
-                assertEquals(event.getInfo().size(), firebaseEvent.getValue().size());
-                for (Map.Entry<String, String> entry : event.getInfo().entrySet()) {
+            if (event.getCustomAttributeStrings() != null) {
+                assertEquals(event.getCustomAttributeStrings().size(), firebaseEvent.getValue().size());
+                for (Map.Entry<String, String> entry : event.getCustomAttributeStrings().entrySet()) {
                     String key = kitInstance.standardizeName(entry.getKey(), true);
                     String value = kitInstance.standardizeValue(entry.getValue(), true);
                     assertEquals(value, firebaseEvent.getValue().getString(key));

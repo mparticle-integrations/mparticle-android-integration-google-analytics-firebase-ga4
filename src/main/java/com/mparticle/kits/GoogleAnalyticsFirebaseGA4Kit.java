@@ -95,7 +95,7 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
         }
 
         FirebaseAnalytics.getInstance(getContext())
-                .logEvent(getFirebaseEventName(mpEvent), toBundle(mpEvent.getInfo()));
+                .logEvent(getFirebaseEventName(mpEvent), toBundle(mpEvent.getCustomAttributeStrings()));
 
         return Collections.singletonList(ReportingMessage.fromEvent(this, mpEvent));
     }
