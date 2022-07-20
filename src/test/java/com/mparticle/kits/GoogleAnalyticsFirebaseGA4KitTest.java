@@ -27,8 +27,8 @@ import org.mockito.Mockito;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -215,8 +215,14 @@ public class GoogleAnalyticsFirebaseGA4KitTest {
 
     @Test
     public void testScreenNameSanitized() {
-        kitInstance.logScreen("Some long Screen name", null);
-        assertEquals("Some_long_Screen_name", FirebaseAnalytics.getInstance(null).getCurrentScreenName());
+        String name = "some long screen name";
+        kitInstance.logScreen(name, new HashMap<String, String>(){{ put("param1","value1");}});
+        assertEquals(1, FirebaseAnalytics.getInstance(null).getLoggedEvents().size());
+        Map.Entry<String, Bundle> entry = FirebaseAnalytics.getInstance(null).getLoggedEvents().get(0);
+        assertEquals(FirebaseAnalytics.Event.SCREEN_VIEW, FirebaseAnalytics.getInstance(null).getLoggedEvents().get(0).getKey());
+        assertEquals("value1", FirebaseAnalytics.getInstance(null).getLoggedEvents().get(0).getValue().getString("param1"));
+        assertEquals("some_long_screen_name", entry.getValue().getString(FirebaseAnalytics.Param.SCREEN_NAME));
+        assertEquals("android.app.Activity", entry.getValue().getString(FirebaseAnalytics.Param.SCREEN_CLASS));
     }
 
 

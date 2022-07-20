@@ -24,8 +24,13 @@ public class FirebaseAnalytics {
     public static class Event {
         public static final String ADD_PAYMENT_INFO = "add_payment_info";
         public static final String ADD_SHIPPING_INFO = "add_shipping_info";
+        public static final String SCREEN_VIEW = "screen_view";
     }
 
+    public static class Param {
+        public static final String SCREEN_NAME = "screen_name";
+        public static final String SCREEN_CLASS = "screen_class";
+    }
 
     static FirebaseAnalytics instance;
 
