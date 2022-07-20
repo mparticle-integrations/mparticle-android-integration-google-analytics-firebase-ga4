@@ -94,8 +94,17 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
             return null;
         }
 
+        if(mpEvent.isScreenEvent()) {
+            return logScreen(mpEvent.getEventName(), mpEvent.getCustomAttributeStrings());
+        }
+
+        String eventName = standardizeName(mpEvent.getEventName(), true);
+        if (mpEvent.getEventType() == MParticle.EventType.Search) {
+            eventName = FirebaseAnalytics.Event.SEARCH;
+        }
+
         FirebaseAnalytics.getInstance(getContext())
-                .logEvent(getFirebaseEventName(mpEvent), toBundle(mpEvent.getCustomAttributeStrings()));
+                .logEvent(eventName, toBundle(mpEvent.getCustomAttributeStrings()));
 
         return Collections.singletonList(ReportingMessage.fromEvent(this, mpEvent));
     }
@@ -108,7 +117,10 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
 
         Activity activity = getCurrentActivity().get();
         if (activity != null) {
-            FirebaseAnalytics.getInstance(getContext()).setCurrentScreen(activity, standardizeName(s, true), null);
+            Bundle bundle = toBundle(map);
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, standardizeName(s, true));
+            bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, activity.getClass().getName());
+            FirebaseAnalytics.getInstance(getContext()).logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
             return Collections.singletonList(new ReportingMessage(this, ReportingMessage.MessageType.SCREEN_VIEW, System.currentTimeMillis(), null));
         }
         return null;
@@ -308,12 +320,9 @@ public class GoogleAnalyticsFirebaseGA4Kit extends KitIntegration implements Kit
     }
 
     String getFirebaseEventName(MPEvent event) {
-        switch (event.getEventType()) {
-            case Search:
-                return FirebaseAnalytics.Event.SEARCH;
-        }
+
         if (event.isScreenEvent()) {
-            return FirebaseAnalytics.Event.VIEW_ITEM;
+            return FirebaseAnalytics.Event.SCREEN_VIEW;
         }
         return standardizeName(event.getEventName(), true);
     }
