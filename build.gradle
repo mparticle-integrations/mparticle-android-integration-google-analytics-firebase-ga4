@@ -10,7 +10,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath 'com.mparticle:android-kit-plugin:' + project.version
         classpath 'com.google.gms:google-services:4.3.13'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -29,5 +29,5 @@ android {
 dependencies {
     testImplementation files('libs/java-json.jar')
     testImplementation files('libs/test-utils.aar')
-    compileOnly 'com.google.firebase:firebase-analytics:21.1.0'
+    compileOnly 'com.google.firebase:firebase-analytics:[17.3.0,)'
 }
