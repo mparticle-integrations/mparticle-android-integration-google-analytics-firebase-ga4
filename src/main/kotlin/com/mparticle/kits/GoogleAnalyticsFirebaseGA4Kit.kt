@@ -550,7 +550,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
         var name = nameIn ?: return null
 
-        name = name.replace("[^a-zA-Z0-9_\\s]".toRegex(), "")
+        name = name.replace("[^a-zA-Z0-9_\\s]".toRegex(), " ")
         name = name.replace("[\\s]+".toRegex(), "_")
         for (forbiddenPrefix in forbiddenPrefixes) {
             if (name.startsWith(forbiddenPrefix)) {
