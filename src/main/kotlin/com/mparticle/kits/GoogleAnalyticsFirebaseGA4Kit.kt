@@ -191,6 +191,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     ) {
         if (!forwardRequestsServerSide()) {
             setUserId(mParticleUser)
+            onSetAllUserAttributes(mParticleUser.userAttributes as Map<String, String>, null,null)
         }
     }
 
@@ -200,6 +201,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     ) {
         if (!forwardRequestsServerSide()) {
             setUserId(mParticleUser)
+            onSetAllUserAttributes(mParticleUser.userAttributes as Map<String, String>, null,null)
         }
     }
 
@@ -218,6 +220,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     ) {
         if (!forwardRequestsServerSide()) {
             setUserId(mParticleUser)
+            onSetAllUserAttributes(mParticleUser.userAttributes as Map<String, String>, null,null)
         }
     }
 
@@ -492,8 +495,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
     override fun onSetAllUserAttributes(
         userAttributesIn: Map<String, String>,
-        userAttributeLists: Map<String, List<String>>,
-        filteredMParticleUser: FilteredMParticleUser
+        userAttributeLists: Map<String, List<String>>?,
+        filteredMParticleUser: FilteredMParticleUser?
     ) {
         var userAttributes: Map<String, String>? = userAttributesIn
         userAttributes = standardizeAttributes(userAttributes, false)
