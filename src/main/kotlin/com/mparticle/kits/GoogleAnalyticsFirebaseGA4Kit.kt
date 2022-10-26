@@ -389,9 +389,18 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                 }
             }
         }
-        return pickyBundle
+
+        commerceEvent.customAttributes?.let { customAttributes ->
+            for (attributes in customAttributes) {
+                pickyBundle.putString(attributes.key, attributes.value.toString())
+            }
+        }
+
+        pickyBundle
             .putString(FirebaseAnalytics.Param.CURRENCY, currency)
             .putBundleList(FirebaseAnalytics.Param.ITEMS, getProductBundles(commerceEvent))
+
+        return pickyBundle
     }
 
     private fun getProductBundles(commerceEvent: CommerceEvent): Array<Bundle> {
