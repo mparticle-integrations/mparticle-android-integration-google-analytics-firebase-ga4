@@ -197,7 +197,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
                     onSetAllUserAttributes(userAttributes, null,null)
                 })
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 Logger.warning(e, "Unable to fetch User Attributes")
             }
         }
@@ -214,7 +214,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
                     onSetAllUserAttributes(userAttributes, null,null)
                 })
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 Logger.warning(e, "Unable to fetch User Attributes")
             }
         }
@@ -240,7 +240,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
                     onSetAllUserAttributes(userAttributes, null,null)
                 })
-            } catch (e: java.lang.Exception) {
+            } catch (e: Exception) {
                 Logger.warning(e, "Unable to fetch User Attributes")
             }
         }
