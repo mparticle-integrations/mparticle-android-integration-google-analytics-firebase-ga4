@@ -16,6 +16,7 @@ import com.mparticle.identity.MParticleUser
 import java.util.HashMap
 import com.mparticle.MParticle
 import com.mparticle.MParticle.EventType
+import com.mparticle.UserAttributeListener
 import com.mparticle.consent.ConsentState
 import com.mparticle.internal.Logger
 import java.math.BigDecimal
@@ -191,7 +192,14 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     ) {
         if (!forwardRequestsServerSide()) {
             setUserId(mParticleUser)
-            onSetAllUserAttributes(mParticleUser.userAttributes as Map<String, String>, null,null)
+            try {
+                mParticleUser.getUserAttributes(UserAttributeListener { userAttributeSingles, userAttributeLists, mpid ->
+                    val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
+                    onSetAllUserAttributes(userAttributes, null,null)
+                })
+            } catch (e: Exception) {
+                Logger.warning(e, "Unable to fetch User Attributes")
+            }
         }
     }
 
@@ -201,7 +209,14 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     ) {
         if (!forwardRequestsServerSide()) {
             setUserId(mParticleUser)
-            onSetAllUserAttributes(mParticleUser.userAttributes as Map<String, String>, null,null)
+            try {
+                mParticleUser.getUserAttributes(UserAttributeListener { userAttributeSingles, userAttributeLists, mpid ->
+                    val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
+                    onSetAllUserAttributes(userAttributes, null,null)
+                })
+            } catch (e: Exception) {
+                Logger.warning(e, "Unable to fetch User Attributes")
+            }
         }
     }
 
@@ -220,7 +235,14 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     ) {
         if (!forwardRequestsServerSide()) {
             setUserId(mParticleUser)
-            onSetAllUserAttributes(mParticleUser.userAttributes as Map<String, String>, null,null)
+            try {
+                mParticleUser.getUserAttributes(UserAttributeListener { userAttributeSingles, userAttributeLists, mpid ->
+                    val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
+                    onSetAllUserAttributes(userAttributes, null,null)
+                })
+            } catch (e: Exception) {
+                Logger.warning(e, "Unable to fetch User Attributes")
+            }
         }
     }
 
