@@ -673,7 +673,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val userAttributeMaxLength = 24
         private const val eventValMaxLength = 100
         private const val userAttributeValMaxLength = 36
-        private const val KIT_NAME = "Google Analytics for Firebase"
+        private const val KIT_NAME = "GA4 for Firebase"
         private const val CURRENCY_FIELD_NOT_SET =
             "Currency field required by Firebase was not set, defaulting to 'USD'"
         private const val USD = "USD"

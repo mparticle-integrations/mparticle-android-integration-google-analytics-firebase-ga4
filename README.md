@@ -11,7 +11,7 @@ This repository contains the [Firebase for GA4](https://firebase.google.com/docs
         implementation 'com.mparticle:android-googleanalyticsfirebasega4-kit:5+'
     }
     ```
-2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"Google Analytics for Firebase detected"` in the output of `adb logcat`.
+2. Follow the mParticle Android SDK [quick-start](https://github.com/mParticle/mparticle-android-sdk), then rebuild and launch your app, and verify that you see `"GA4 for Firebase detected"` in the output of `adb logcat`.
 3. Reference mParticle's integration docs below to enable the integration.
 
 ### Documentation
