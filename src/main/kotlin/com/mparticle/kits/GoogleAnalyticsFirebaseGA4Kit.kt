@@ -31,9 +31,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         context: Context
     ): List<ReportingMessage>? {
         Logger.info("$name Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work")
-        if (forwardRequestsServerSide()) {
-            updateInstanceIDIntegration()
-        }
+        updateInstanceIDIntegration()
         return null
     }
 
