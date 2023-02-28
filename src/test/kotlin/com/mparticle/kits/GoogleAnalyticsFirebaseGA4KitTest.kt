@@ -56,9 +56,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         kitInstance.kitManager = kitManager
         kitInstance.configuration =
             KitConfiguration.createKitConfiguration(JSONObject().put("id", "-1"))
-        kitInstance.onKitCreate(HashMap(), Mockito.mock(Context::class.java))
         firebaseSdk = FirebaseAnalytics.getInstance(null)!!
-
     }
 
     /**
