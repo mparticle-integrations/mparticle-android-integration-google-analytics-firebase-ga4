@@ -580,10 +580,9 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
     fun standardizeName(nameIn: String?, event: Boolean): String? {
 
-        var name = nameIn ?: return null
+        var name = nameIn ?: return invalidGA4Key
 
-        name = name.replace("[^a-zA-Z0-9_\\s]".toRegex(), " ")
-        name = name.replace("[\\s]+".toRegex(), "_")
+        name = name.replace("[^a-zA-Z0-9_]".toRegex(), "_")
         for (forbiddenPrefix in forbiddenPrefixes) {
             if (name.startsWith(forbiddenPrefix)) {
                 name = name.replaceFirst(forbiddenPrefix.toRegex(), "")
@@ -601,7 +600,11 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                 name = name.substring(0, userAttributeMaxLength)
             }
         }
-        return name
+        if (name.isNotEmpty()) {
+            return name
+        } else {
+            return invalidGA4Key
+        }
     }
 
     class PickyBundle {
@@ -671,6 +674,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val userAttributeMaxLength = 24
         private const val eventValMaxLength = 100
         private const val userAttributeValMaxLength = 36
+        private const val invalidGA4Key = "invalid_ga4_key"
         private const val KIT_NAME = "GA4 for Firebase"
         private const val CURRENCY_FIELD_NOT_SET =
             "Currency field required by Firebase was not set, defaulting to 'USD'"

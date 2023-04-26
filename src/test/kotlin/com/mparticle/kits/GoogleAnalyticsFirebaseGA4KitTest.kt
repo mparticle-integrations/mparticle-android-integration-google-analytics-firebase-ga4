@@ -228,11 +228,11 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             kitInstance.standardizeName(emptySpace2, random.nextBoolean())
         )
         TestCase.assertEquals(
-            "event_name_",
+            "event__name_",
             kitInstance.standardizeName(emptySpace3, random.nextBoolean())
         )
         TestCase.assertEquals(
-            "event_name_",
+            "event___name_",
             kitInstance.standardizeName(emptySpace4, random.nextBoolean())
         )
         val badStarts = arrayOf(
@@ -260,6 +260,16 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         TestCase.assertEquals(36, sanitized.length)
         TestCase.assertTrue(tooLong.startsWith(sanitized))
 
+        val emptyStrings = arrayOf(
+            "!@#$%^&*()_+=[]{}|'\"?><:;",
+            "_1234567890",
+            " ",
+            ""
+        )
+        for (emptyString in emptyStrings) {
+            val empty = kitInstance.standardizeName(emptyString, random.nextBoolean())
+            TestCase.assertEquals("invalid_ga4_key", empty)
+        }
     }
 
     @Test
