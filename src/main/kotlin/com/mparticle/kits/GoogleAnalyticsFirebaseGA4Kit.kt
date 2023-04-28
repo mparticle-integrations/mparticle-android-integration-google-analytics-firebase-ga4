@@ -582,14 +582,16 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
         var name = nameIn ?: return invalidGA4Key
 
-        name = name.replace("[^a-zA-Z0-9_]".toRegex(), "_")
-        for (forbiddenPrefix in forbiddenPrefixes) {
-            if (name.startsWith(forbiddenPrefix)) {
-                name = name.replaceFirst(forbiddenPrefix.toRegex(), "")
+        if (event) {
+            name = name.replace("[^a-zA-Z0-9_]".toRegex(), "_")
+            for (forbiddenPrefix in forbiddenPrefixes) {
+                if (name.startsWith(forbiddenPrefix)) {
+                    name = name.replaceFirst(forbiddenPrefix.toRegex(), "")
+                }
             }
-        }
-        while (name.isNotEmpty() && !Character.isLetter(name.toCharArray()[0])) {
-            name = name.substring(1)
+            while (name.isNotEmpty() && !Character.isLetter(name.toCharArray()[0])) {
+                name = name.substring(1)
+            }
         }
         if (event) {
             if (name.length > eventMaxLength) {

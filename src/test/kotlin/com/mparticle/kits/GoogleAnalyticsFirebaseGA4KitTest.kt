@@ -212,7 +212,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     fun testNameStandardization() {
         val badPrefixes = arrayOf("firebase_event_name", "google_event_name", "ga_event_name")
         for (badPrefix in badPrefixes) {
-            val clean = kitInstance.standardizeName(badPrefix, random.nextBoolean())
+            val clean = kitInstance.standardizeName(badPrefix, true)
             TestCase.assertEquals("event_name", clean)
         }
         val emptySpace1 = "event name"
@@ -221,20 +221,41 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         val emptySpace4 = "event - name "
         TestCase.assertEquals(
             "event_name",
-            kitInstance.standardizeName(emptySpace1, random.nextBoolean())
+            kitInstance.standardizeName(emptySpace1, true)
         )
         TestCase.assertEquals(
             "event_name_",
-            kitInstance.standardizeName(emptySpace2, random.nextBoolean())
+            kitInstance.standardizeName(emptySpace2, true)
         )
         TestCase.assertEquals(
             "event__name_",
-            kitInstance.standardizeName(emptySpace3, random.nextBoolean())
+            kitInstance.standardizeName(emptySpace3, true)
         )
         TestCase.assertEquals(
             "event___name_",
-            kitInstance.standardizeName(emptySpace4, random.nextBoolean())
+            kitInstance.standardizeName(emptySpace4, true)
         )
+        TestCase.assertEquals(
+            "event_name ",
+            kitInstance.standardizeName(emptySpace2, false)
+        )
+        TestCase.assertEquals(
+            "event  name ",
+            kitInstance.standardizeName(emptySpace3, false)
+        )
+        TestCase.assertEquals(
+            "event - name ",
+            kitInstance.standardizeName(emptySpace4, false)
+        )
+        TestCase.assertEquals(
+            "!event - name !",
+            kitInstance.standardizeName("!event - name !", false)
+        )
+        TestCase.assertEquals(
+            "!@#\$%^&*()_+=[]{}|'\"?>",
+            kitInstance.standardizeName("!@#\$%^&*()_+=[]{}|'\"?>", false)
+        )
+
         val badStarts = arrayOf(
             "!@#$%^&*()_+=[]{}|'\"?><:;event_name",
             "_event_name",
@@ -242,7 +263,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             "_event_name"
         )
         for (badStart in badStarts) {
-            val clean = kitInstance.standardizeName(badStart, random.nextBoolean())
+            val clean = kitInstance.standardizeName(badStart, true)
             TestCase.assertEquals("event_name", clean)
         }
         val tooLong =
@@ -267,7 +288,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             ""
         )
         for (emptyString in emptyStrings) {
-            val empty = kitInstance.standardizeName(emptyString, random.nextBoolean())
+            val empty = kitInstance.standardizeName(emptyString, true)
             TestCase.assertEquals("invalid_ga4_key", empty)
         }
     }
