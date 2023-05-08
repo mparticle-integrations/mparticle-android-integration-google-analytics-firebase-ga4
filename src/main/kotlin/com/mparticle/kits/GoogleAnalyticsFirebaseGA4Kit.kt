@@ -51,8 +51,17 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         if (forwardRequestsServerSide()) {
             return null
         }
+
+        val bundle = toBundle(mpEvent.customAttributeStrings)
+        if (bundle.keySet().size > eventMaxParameterProperty) {
+            val keyArray = bundle.keySet().toTypedArray()
+            keyArray.sort()
+            for (i in eventMaxParameterProperty..keyArray.size-1) {
+                bundle.remove(keyArray[i])
+            }
+        }
         FirebaseAnalytics.getInstance(context)
-            .logEvent(getFirebaseEventName(mpEvent)!!, toBundle(mpEvent.customAttributeStrings))
+            .logEvent(getFirebaseEventName(mpEvent)!!, bundle)
         return listOf(ReportingMessage.fromEvent(this, mpEvent))
     }
 
@@ -114,6 +123,13 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         commerceEvent.promotions?.let {
             for (promotion in it) {
                 bundle = getPromotionCommerceEventBundle(promotion).bundle
+                if (bundle.keySet().size > eventMaxParameterProperty) {
+                    val keyArray = bundle.keySet().toTypedArray()
+                    keyArray.sort()
+                    for (i in eventMaxParameterProperty..keyArray.size-1) {
+                        bundle.remove(keyArray[i])
+                    }
+                }
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -131,6 +147,13 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     impression.listName,
                     impression.products
                 ).bundle
+                if (bundle.keySet().size > eventMaxParameterProperty) {
+                    val keyArray = bundle.keySet().toTypedArray()
+                    keyArray.sort()
+                    for (i in eventMaxParameterProperty..keyArray.size-1) {
+                        bundle.remove(keyArray[i])
+                    }
+                }
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -180,6 +203,14 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             }
             Product.DETAIL -> FirebaseAnalytics.Event.VIEW_ITEM
             else -> return
+        }
+
+        if (bundle.keySet().size > eventMaxParameterProperty) {
+            val keyArray = bundle.keySet().toTypedArray()
+            keyArray.sort()
+            for (i in eventMaxParameterProperty..keyArray.size-1) {
+                bundle.remove(keyArray[i])
+            }
         }
         instance.logEvent(eventName, bundle)
     }
@@ -433,6 +464,13 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             val bundles = arrayOfNulls<Bundle>(products.size)
             for ((i, product) in products.withIndex()) {
                 val bundle = getBundle(product)
+                if (bundle.bundle.keySet().size > itemMaxParameter) {
+                    val keyArray = bundle.bundle.keySet().toTypedArray()
+                    keyArray.sort()
+                    for (i in itemMaxParameter..keyArray.size-1) {
+                        bundle.bundle.remove(keyArray[i])
+                    }
+                }
                 bundles[i] = bundle.bundle
             }
             return products.map { getBundle(it).bundle }.toTypedArray()
@@ -676,6 +714,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val userAttributeMaxLength = 24
         private const val eventValMaxLength = 100
         private const val userAttributeValMaxLength = 36
+        private const val eventMaxParameterProperty = 25
+        private const val itemMaxParameter = 10
         private const val invalidGA4Key = "invalid_ga4_key"
         private const val KIT_NAME = "GA4 for Firebase"
         private const val CURRENCY_FIELD_NOT_SET =
