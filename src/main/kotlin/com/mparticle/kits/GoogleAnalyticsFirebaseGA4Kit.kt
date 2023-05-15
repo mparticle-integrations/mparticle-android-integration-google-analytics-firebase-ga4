@@ -53,13 +53,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         }
 
         val bundle = toBundle(mpEvent.customAttributeStrings)
-        if (bundle.keySet().size > eventMaxParameterProperty) {
-            val keyArray = bundle.keySet().toTypedArray()
-            keyArray.sort()
-            for (i in eventMaxParameterProperty..keyArray.size-1) {
-                bundle.remove(keyArray[i])
-            }
-        }
+        bundle.trimIfNecessary(eventMaxParameterProperty)
         FirebaseAnalytics.getInstance(context)
             .logEvent(getFirebaseEventName(mpEvent)!!, bundle)
         return listOf(ReportingMessage.fromEvent(this, mpEvent))
@@ -123,13 +117,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         commerceEvent.promotions?.let {
             for (promotion in it) {
                 bundle = getPromotionCommerceEventBundle(promotion).bundle
-                if (bundle.keySet().size > eventMaxParameterProperty) {
-                    val keyArray = bundle.keySet().toTypedArray()
-                    keyArray.sort()
-                    for (i in eventMaxParameterProperty..keyArray.size-1) {
-                        bundle.remove(keyArray[i])
-                    }
-                }
+                bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -147,13 +135,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     impression.listName,
                     impression.products
                 ).bundle
-                if (bundle.keySet().size > eventMaxParameterProperty) {
-                    val keyArray = bundle.keySet().toTypedArray()
-                    keyArray.sort()
-                    for (i in eventMaxParameterProperty..keyArray.size-1) {
-                        bundle.remove(keyArray[i])
-                    }
-                }
+                bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -205,13 +187,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             else -> return
         }
 
-        if (bundle.keySet().size > eventMaxParameterProperty) {
-            val keyArray = bundle.keySet().toTypedArray()
-            keyArray.sort()
-            for (i in eventMaxParameterProperty..keyArray.size-1) {
-                bundle.remove(keyArray[i])
-            }
-        }
+        bundle.trimIfNecessary(eventMaxParameterProperty)
         instance.logEvent(eventName, bundle)
     }
 
@@ -464,13 +440,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             val bundles = arrayOfNulls<Bundle>(products.size)
             for ((i, product) in products.withIndex()) {
                 val bundle = getBundle(product)
-                if (bundle.bundle.keySet().size > itemMaxParameter) {
-                    val keyArray = bundle.bundle.keySet().toTypedArray()
-                    keyArray.sort()
-                    for (i in itemMaxParameter..keyArray.size-1) {
-                        bundle.bundle.remove(keyArray[i])
-                    }
-                }
+                bundle.bundle.trimIfNecessary(itemMaxParameter)
                 bundles[i] = bundle.bundle
             }
             return products.map { getBundle(it).bundle }.toTypedArray()
@@ -721,5 +691,15 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val CURRENCY_FIELD_NOT_SET =
             "Currency field required by Firebase was not set, defaulting to 'USD'"
         private const val USD = "USD"
+    }
+
+    private fun Bundle.trimIfNecessary(maxParam: Int) {
+        if (this.keySet().size > maxParam) {
+            val keyArray = this.keySet().toTypedArray()
+            keyArray.sort()
+            for (i in maxParam..keyArray.size-1) {
+                this.remove(keyArray[i])
+            }
+        }
     }
 }

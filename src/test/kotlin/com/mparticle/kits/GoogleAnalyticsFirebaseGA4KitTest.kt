@@ -3,6 +3,7 @@ package com.mparticle.kits
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.mparticle.MPEvent
 import com.mparticle.MParticle
