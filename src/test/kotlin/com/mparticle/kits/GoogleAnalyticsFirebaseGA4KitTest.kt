@@ -3,6 +3,7 @@ package com.mparticle.kits
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.mparticle.MPEvent
 import com.mparticle.MParticle
@@ -266,9 +267,24 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             val clean = kitInstance.standardizeName(badStart, true)
             TestCase.assertEquals("event_name", clean)
         }
+        val justFine =
+            "abcdefghijklmnopqrstuvwx"
+        var sanitized: String = kitInstance.standardizeName(justFine, true).toString()
+        TestCase.assertEquals(24, sanitized.length)
+        TestCase.assertTrue(justFine.startsWith(sanitized))
+        sanitized = kitInstance.standardizeName(justFine, false).toString()
+        TestCase.assertEquals(24, sanitized.length)
+        TestCase.assertTrue(justFine.startsWith(sanitized))
+        sanitized = kitInstance.standardizeValue(justFine, true)
+        TestCase.assertEquals(24, sanitized.length)
+        TestCase.assertTrue(justFine.startsWith(sanitized))
+        sanitized = kitInstance.standardizeValue(justFine, false)
+        TestCase.assertEquals(24, sanitized.length)
+        TestCase.assertTrue(justFine.startsWith(sanitized))
+
         val tooLong =
             "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890"
-        var sanitized: String = kitInstance.standardizeName(tooLong, true).toString()
+        sanitized  = kitInstance.standardizeName(tooLong, true).toString()
         TestCase.assertEquals(40, sanitized.length)
         TestCase.assertTrue(tooLong.startsWith(sanitized))
         sanitized = kitInstance.standardizeName(tooLong, false).toString()
@@ -291,6 +307,136 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             val empty = kitInstance.standardizeName(emptyString, true)
             TestCase.assertEquals("invalid_ga4_key", empty)
         }
+    }
+
+    @Test
+    fun testMaxStandardization() {
+        val testSucccessAttributes = mapOf(
+            "test1" to "parameter",
+            "test2" to "parameter",
+            "test3" to "parameter",
+            "test4" to "parameter",
+            "test5" to "parameter",
+            "test6" to "parameter",
+            "test7" to "parameter",
+            "test8" to "parameter",
+            "test9" to "parameter",
+            "test10" to "parameter",
+            "test11" to "parameter",
+            "test12" to "parameter",
+            "test13" to "parameter",
+            "test14" to "parameter",
+            "test15" to "parameter",
+            "test16" to "parameter",
+            "test17" to "parameter",
+            "test18" to "parameter",
+            "test19" to "parameter",
+            "test20" to "parameter",
+            "test21" to "parameter",
+            "test22" to "parameter",
+            "test23" to "parameter",
+            "test24" to "parameter"
+        )
+        val testTruncatedAttributes = mapOf(
+            "test1" to "parameter",
+            "test2" to "parameter",
+            "test3" to "parameter",
+            "test4" to "parameter",
+            "test5" to "parameter",
+            "test6" to "parameter",
+            "test7" to "parameter",
+            "test8" to "parameter",
+            "test9" to "parameter",
+            "test10" to "parameter",
+            "test11" to "parameter",
+            "test12" to "parameter",
+            "test13" to "parameter",
+            "test14" to "parameter",
+            "test15" to "parameter",
+            "test16" to "parameter",
+            "test17" to "parameter",
+            "test18" to "parameter",
+            "test19" to "parameter",
+            "test20" to "parameter",
+            "test21" to "parameter",
+            "test22" to "parameter",
+            "test23" to "parameter",
+            "test24" to "parameter",
+            "z1" to "parameter",
+            "z2" to "parameter",
+            "z3" to "parameter",
+            "z4" to "parameter"
+        )
+        val testFinalAttributes = mapOf(
+            "test1" to "parameter",
+            "test2" to "parameter",
+            "test3" to "parameter",
+            "test4" to "parameter",
+            "test5" to "parameter",
+            "test6" to "parameter",
+            "test7" to "parameter",
+            "test8" to "parameter",
+            "test9" to "parameter",
+            "test10" to "parameter",
+            "test11" to "parameter",
+            "test12" to "parameter",
+            "test13" to "parameter",
+            "test14" to "parameter",
+            "test15" to "parameter",
+            "test16" to "parameter",
+            "test17" to "parameter",
+            "test18" to "parameter",
+            "test19" to "parameter",
+            "test20" to "parameter",
+            "test21" to "parameter",
+            "test22" to "parameter",
+            "test23" to "parameter",
+            "test24" to "parameter",
+            "currency" to "USD"
+        )
+        val event = CommerceEvent.Builder(
+            Product.CHECKOUT_OPTION,
+            Product.Builder("asdv", "asdv", 1.3).build()
+        )
+            .build()
+        event.customAttributes = testSucccessAttributes
+        kitInstance.logEvent(event)
+        TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
+        TestCase.assertEquals(25, firebaseSdk.loggedEvents[0].value.size())
+        TestCase.assertEquals(testFinalAttributes, firebaseSdk.loggedEvents[0].value)
+        firebaseSdk.clearLoggedEvents()
+
+        event.customAttributes = testTruncatedAttributes
+        kitInstance.logEvent(event)
+        TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
+        TestCase.assertEquals(25, firebaseSdk.loggedEvents[0].value.size())
+        TestCase.assertEquals(testFinalAttributes, firebaseSdk.loggedEvents[0].value)
+        firebaseSdk.clearLoggedEvents()
+//
+//        MPProduct *product1 = [[MPProduct alloc] initWithName:@"William Hartnell" sku:@"1who" quantity:@1 price:@42.0];
+//        MPProduct *product2 = [[MPProduct alloc] initWithName:@"Patrick Troughton" sku:@"2who" quantity:@1 price:@42.0];
+//        MPProduct *product3 = [[MPProduct alloc] initWithName:@"Jon Pertwee" sku:@"3who" quantity:@1 price:@42.0];
+//        MPProduct *product4 = [[MPProduct alloc] initWithName:@"Tom Baker" sku:@"4who" quantity:@1 price:@42.0];
+//        MPProduct *product5 = [[MPProduct alloc] initWithName:@"Peter Davison" sku:@"5who" quantity:@1 price:@42.0];
+//        MPProduct *product6 = [[MPProduct alloc] initWithName:@"Colin Baker" sku:@"6who" quantity:@1 price:@42.0];
+//        MPProduct *product7 = [[MPProduct alloc] initWithName:@"Sylvester McCoy" sku:@"7who" quantity:@1 price:@42.0];
+//        MPProduct *product8 = [[MPProduct alloc] initWithName:@"Paul McGann" sku:@"8who" quantity:@1 price:@42.0];
+//        MPProduct *product9 = [[MPProduct alloc] initWithName:@"Christopher Eccleston" sku:@"9who" quantity:@1 price:@42.0];
+//        MPProduct *product10 = [[MPProduct alloc] initWithName:@"David Tennant" sku:@"10who" quantity:@1 price:@42.0];
+//        MPProduct *product11 = [[MPProduct alloc] initWithName:@"Matt Smith" sku:@"11who" quantity:@1 price:@42.0];
+//        MPProduct *product12 = [[MPProduct alloc] initWithName:@"Peter Capaldi" sku:@"12who" quantity:@1 price:@42.0];
+//        MPProduct *product13 = [[MPProduct alloc] initWithName:@"Jodie Whittaker" sku:@"13who" quantity:@1 price:@42.0];
+//
+//        MPCommerceEvent *purchaseEvent = [[MPCommerceEvent alloc] initWithAction:MPCommerceEventActionPurchase];
+//        purchaseEvent.products = @[product1, product2, product3, product4, product5, product6, product7, product8, product9, product10, product11, product12, product13];
+//
+//        parameters = [exampleKit getParameterForCommerceEvent:purchaseEvent];
+//        XCTAssertEqual([parameters count], 2);
+//        XCTAssertEqual([parameters[@"items"] count], 13);
+//        XCTAssertTrue([parameters[@"items"][0] count] <= 10);
+//
+//        execStatus = [exampleKit logBaseEvent:purchaseEvent];
+//        XCTAssertTrue(execStatus.success);
     }
 
     @Test
