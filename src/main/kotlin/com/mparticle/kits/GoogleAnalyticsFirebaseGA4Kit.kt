@@ -52,7 +52,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         }
 
         val bundle =
-            toBundle(mpEvent.customAttributeStrings?.trimIfNecessary(eventMaxParameterProperty))
+            toBundle(trimIfNecessary(mpEvent.customAttributeStrings, eventMaxParameterProperty))
         FirebaseAnalytics.getInstance(context)
             .logEvent(getFirebaseEventName(mpEvent)!!, bundle)
         return listOf(ReportingMessage.fromEvent(this, mpEvent))
@@ -690,16 +690,19 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             "Currency field required by Firebase was not set, defaulting to 'USD'"
         private const val USD = "USD"
     }
-    
-    private fun Map<String, String>?.trimIfNecessary(maxParam: Int): Map<String, String?>? {
-        return this?.let {
-            val map = mutableMapOf<String, String?>()
-            this.keys.sorted().forEachIndexed { index, key ->
+
+    private fun trimIfNecessary(
+        map: Map<String, String>?,
+        maxParam: Int
+    ): Map<String, String?>? {
+        return map?.let {
+            val result = mutableMapOf<String, String?>()
+            it.keys.sorted().forEachIndexed { index, key ->
                 if (index <= maxParam) {
-                    map.put(key, this[key])
+                    result.put(key, it[key])
                 }
             }
-            return@let map
+            return@let result
         }
     }
 }
