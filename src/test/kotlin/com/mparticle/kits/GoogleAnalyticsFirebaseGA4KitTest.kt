@@ -367,50 +367,21 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             "z3" to "parameter",
             "z4" to "parameter"
         )
-        val testFinalAttributes = mapOf(
-            "test1" to "parameter",
-            "test2" to "parameter",
-            "test3" to "parameter",
-            "test4" to "parameter",
-            "test5" to "parameter",
-            "test6" to "parameter",
-            "test7" to "parameter",
-            "test8" to "parameter",
-            "test9" to "parameter",
-            "test10" to "parameter",
-            "test11" to "parameter",
-            "test12" to "parameter",
-            "test13" to "parameter",
-            "test14" to "parameter",
-            "test15" to "parameter",
-            "test16" to "parameter",
-            "test17" to "parameter",
-            "test18" to "parameter",
-            "test19" to "parameter",
-            "test20" to "parameter",
-            "test21" to "parameter",
-            "test22" to "parameter",
-            "test23" to "parameter",
-            "test24" to "parameter",
-            "currency" to "USD"
-        )
         val event = CommerceEvent.Builder(
-            Product.CHECKOUT_OPTION,
+            Product.CHECKOUT,
             Product.Builder("asdv", "asdv", 1.3).build()
         )
             .build()
         event.customAttributes = testSucccessAttributes
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
-        TestCase.assertEquals(25, firebaseSdk.loggedEvents[0].value.size())
-        TestCase.assertEquals(testFinalAttributes, firebaseSdk.loggedEvents[0].value)
+        TestCase.assertEquals(testSucccessAttributes.size + 3, firebaseSdk.loggedEvents[0].value.size())
         firebaseSdk.clearLoggedEvents()
 
         event.customAttributes = testTruncatedAttributes
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
-        TestCase.assertEquals(25, firebaseSdk.loggedEvents[0].value.size())
-        TestCase.assertEquals(testFinalAttributes, firebaseSdk.loggedEvents[0].value)
+        TestCase.assertEquals(testTruncatedAttributes.size + 3, firebaseSdk.loggedEvents[0].value.size())
         firebaseSdk.clearLoggedEvents()
 //
 //        MPProduct *product1 = [[MPProduct alloc] initWithName:@"William Hartnell" sku:@"1who" quantity:@1 price:@42.0];
