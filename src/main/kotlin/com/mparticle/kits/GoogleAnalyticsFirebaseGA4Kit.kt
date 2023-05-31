@@ -116,6 +116,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         commerceEvent.promotions?.let {
             for (promotion in it) {
                 bundle = getPromotionCommerceEventBundle(promotion).bundle
+                bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -133,6 +134,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     impression.listName,
                     impression.products
                 ).bundle
+                bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -436,6 +438,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             val bundles = arrayOfNulls<Bundle>(products.size)
             for ((i, product) in products.withIndex()) {
                 val bundle = getBundle(product)
+                bundle.bundle.trimIfNecessary(itemMaxParameter)
                 bundles[i] = bundle.bundle
             }
             return products.map { getBundle(it).bundle }.toTypedArray()
@@ -687,7 +690,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             "Currency field required by Firebase was not set, defaulting to 'USD'"
         private const val USD = "USD"
     }
-
+    
     private fun Map<String, String>?.trimIfNecessary(maxParam: Int): Map<String, String?>? {
         return this?.let {
             val map = mutableMapOf<String, String?>()
@@ -699,5 +702,4 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             return@let map
         }
     }
-
 }
