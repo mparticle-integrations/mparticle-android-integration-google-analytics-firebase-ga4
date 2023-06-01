@@ -13,7 +13,6 @@ import com.mparticle.commerce.CommerceEvent
 import com.mparticle.commerce.Promotion
 import com.mparticle.commerce.Product
 import com.mparticle.identity.MParticleUser
-import java.util.HashMap
 import com.mparticle.MParticle
 import com.mparticle.MParticle.EventType
 import com.mparticle.UserAttributeListener
@@ -52,8 +51,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             return null
         }
 
-        val bundle = toBundle(mpEvent.customAttributeStrings)
-        bundle.trimIfNecessary(eventMaxParameterProperty)
+        val bundle =
+            toBundle(trimIfNecessary(mpEvent.customAttributeStrings, eventMaxParameterProperty))
         FirebaseAnalytics.getInstance(context)
             .logEvent(getFirebaseEventName(mpEvent)!!, bundle)
         return listOf(ReportingMessage.fromEvent(this, mpEvent))
@@ -117,7 +116,6 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         commerceEvent.promotions?.let {
             for (promotion in it) {
                 bundle = getPromotionCommerceEventBundle(promotion).bundle
-                bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -135,7 +133,6 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     impression.listName,
                     impression.products
                 ).bundle
-                bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -187,7 +184,6 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             else -> return
         }
 
-        bundle.trimIfNecessary(eventMaxParameterProperty)
         instance.logEvent(eventName, bundle)
     }
 
@@ -200,7 +196,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             try {
                 mParticleUser.getUserAttributes(UserAttributeListener { userAttributeSingles, userAttributeLists, mpid ->
                     val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
-                    onSetAllUserAttributes(userAttributes, null,null)
+                    onSetAllUserAttributes(userAttributes, null, null)
                 })
             } catch (e: Exception) {
                 Logger.warning(e, "Unable to fetch User Attributes")
@@ -217,7 +213,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             try {
                 mParticleUser.getUserAttributes(UserAttributeListener { userAttributeSingles, userAttributeLists, mpid ->
                     val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
-                    onSetAllUserAttributes(userAttributes, null,null)
+                    onSetAllUserAttributes(userAttributes, null, null)
                 })
             } catch (e: Exception) {
                 Logger.warning(e, "Unable to fetch User Attributes")
@@ -243,7 +239,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             try {
                 mParticleUser.getUserAttributes(UserAttributeListener { userAttributeSingles, userAttributeLists, mpid ->
                     val userAttributes: MutableMap<String, String> = HashMap(userAttributeSingles)
-                    onSetAllUserAttributes(userAttributes, null,null)
+                    onSetAllUserAttributes(userAttributes, null, null)
                 })
             } catch (e: Exception) {
                 Logger.warning(e, "Unable to fetch User Attributes")
@@ -343,7 +339,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         } else standardizeName(event.eventName, true)
     }
 
-    private fun toBundle(mapIn: Map<String, String>?): Bundle {
+    private fun toBundle(mapIn: Map<String, String?>?): Bundle {
         var map = mapIn
         val bundle = Bundle()
         map = standardizeAttributes(map, true)
@@ -440,7 +436,6 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             val bundles = arrayOfNulls<Bundle>(products.size)
             for ((i, product) in products.withIndex()) {
                 val bundle = getBundle(product)
-                bundle.bundle.trimIfNecessary(itemMaxParameter)
                 bundles[i] = bundle.bundle
             }
             return products.map { getBundle(it).bundle }.toTypedArray()
@@ -535,7 +530,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         userAttributeLists: Map<String, List<String>>?,
         filteredMParticleUser: FilteredMParticleUser?
     ) {
-        var userAttributes: Map<String, String>? = userAttributesIn
+        var userAttributes: Map<String, String?>? = userAttributesIn
         userAttributes = standardizeAttributes(userAttributes, false)
         if (userAttributes != null) {
             for ((key, value) in userAttributes) {
@@ -556,13 +551,13 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     }
 
     private fun standardizeAttributes(
-        attributes: Map<String, String>?,
+        attributes: Map<String, String?>?,
         event: Boolean
-    ): Map<String, String>? {
+    ): Map<String, String?>? {
         if (attributes == null) {
             return null
         }
-        val attributeCopy = HashMap<String, String>()
+        val attributeCopy = HashMap<String, String?>()
         for ((key, value) in attributes) {
 
             standardizeName(key, event)?.let {
@@ -693,13 +688,18 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val USD = "USD"
     }
 
-    private fun Bundle.trimIfNecessary(maxParam: Int) {
-        if (this.keySet().size > maxParam) {
-            val keyArray = this.keySet().toTypedArray()
-            keyArray.sort()
-            for (i in maxParam..keyArray.size-1) {
-                this.remove(keyArray[i])
+    private fun trimIfNecessary(
+        map: Map<String, String>?,
+        maxParam: Int
+    ): Map<String, String?>? {
+        return map?.let {
+            val result = mutableMapOf<String, String?>()
+            it.keys.sorted().forEachIndexed { index, key ->
+                if (index <= maxParam) {
+                    result.put(key, it[key])
+                }
             }
+            return@let result
         }
     }
 }
