@@ -137,6 +137,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                 ).bundle
                 bundle.trimIfNecessary(eventMaxParameterProperty)
                 instance.logEvent(eventName, bundle)
+                
             }
         }
     }
