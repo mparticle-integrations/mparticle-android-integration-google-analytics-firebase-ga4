@@ -66,7 +66,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
      */
     @Test
     fun testEmptyEvent() {
-        kitInstance.logEvent(MPEvent.Builder("eventName", MParticle.EventType.Other).build())
+        kitInstance.logEventTest(MPEvent.Builder("eventName", MParticle.EventType.Other).build())
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
         var firebaseEvent = firebaseSdk.loggedEvents[0]
         TestCase.assertEquals("eventName", firebaseEvent.key)
@@ -75,7 +75,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         for (i in 0..9) {
             val event = TestingUtils.getInstance().randomMPEventRich
             firebaseSdk.clearLoggedEvents()
-            kitInstance.logEvent(event)
+            kitInstance.logEventTest(event)
             TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
             firebaseEvent = firebaseSdk.loggedEvents[0]
             if (event.eventType != MParticle.EventType.Search) {

@@ -59,6 +59,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         return listOf(ReportingMessage.fromEvent(this, mpEvent))
     }
 
+    fun logEventTest(mpEvent: MPEvent): List<ReportingMessage>?  {
+        return logEvent(mpEvent)
+    }
+
     public override fun logScreen(s: String, map: Map<String, String>?): List<ReportingMessage> {
         if (forwardRequestsServerSide()) {
             return emptyList()
