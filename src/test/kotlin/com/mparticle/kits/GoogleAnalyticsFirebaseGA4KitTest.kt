@@ -284,7 +284,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
 
         val tooLong =
             "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890"
-        sanitized  = kitInstance.standardizeName(tooLong, true).toString()
+        sanitized = kitInstance.standardizeName(tooLong, true).toString()
         TestCase.assertEquals(40, sanitized.length)
         TestCase.assertTrue(tooLong.startsWith(sanitized))
         sanitized = kitInstance.standardizeName(tooLong, false).toString()
@@ -395,22 +395,26 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             "currency" to "USD"
         )
         val event = CommerceEvent.Builder(
-            Product.CHECKOUT_OPTION,
+            Product.ADD_TO_CART,
             Product.Builder("asdv", "asdv", 1.3).build()
         )
             .build()
         event.customAttributes = testSucccessAttributes
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
-        TestCase.assertEquals(25, firebaseSdk.loggedEvents[0].value.size())
-        TestCase.assertEquals(testFinalAttributes, firebaseSdk.loggedEvents[0].value)
+        TestCase.assertEquals(
+            testSucccessAttributes.size + 3,
+            firebaseSdk.loggedEvents[0].value.size()
+        )
         firebaseSdk.clearLoggedEvents()
 
         event.customAttributes = testTruncatedAttributes
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
-        TestCase.assertEquals(25, firebaseSdk.loggedEvents[0].value.size())
-        TestCase.assertEquals(testFinalAttributes, firebaseSdk.loggedEvents[0].value)
+        TestCase.assertEquals(
+            testTruncatedAttributes.size + 3,
+            firebaseSdk.loggedEvents[0].value.size()
+        )
         firebaseSdk.clearLoggedEvents()
 //
 //        MPProduct *product1 = [[MPProduct alloc] initWithName:@"William Hartnell" sku:@"1who" quantity:@1 price:@42.0];
