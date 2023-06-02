@@ -47,7 +47,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         s: String
     ): List<ReportingMessage> = emptyList()
 
-    override fun logEvent(mpEvent: MPEvent): List<ReportingMessage>? {
+    public override fun logEvent(mpEvent: MPEvent): List<ReportingMessage>? {
         if (forwardRequestsServerSide()) {
             return null
         }
@@ -59,7 +59,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         return listOf(ReportingMessage.fromEvent(this, mpEvent))
     }
 
-    override fun logScreen(s: String, map: Map<String, String>?): List<ReportingMessage> {
+    public override fun logScreen(s: String, map: Map<String, String>?): List<ReportingMessage> {
         if (forwardRequestsServerSide()) {
             return emptyList()
         }
@@ -86,7 +86,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         map: Map<String, String>
     ): List<ReportingMessage> = emptyList()
 
-    override fun logEvent(commerceEvent: CommerceEvent): List<ReportingMessage>? {
+    public override fun logEvent(commerceEvent: CommerceEvent): List<ReportingMessage>? {
         if (forwardRequestsServerSide()) {
             return null
         }
