@@ -4,3 +4,6 @@ jobs:
   pr-check:
     name: "Pull Request Check"
     uses: mParticle/mparticle-workflows/.github/workflows/android-kit-pull-request.yml@main
+    with:
+      branch-name: ${{ github.head_ref }}
+      
