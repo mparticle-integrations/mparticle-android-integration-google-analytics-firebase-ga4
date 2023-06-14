@@ -413,9 +413,13 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             }
         }
 
-        commerceEvent.customAttributes?.let { customAttributes ->
-            for (attributes in customAttributes) {
-                pickyBundle.putString(attributes.key, attributes.value.toString())
+        commerceEvent.customAttributeStrings?.let { customAttributes ->
+            var map = standardizeAttributes(customAttributes, true)
+
+            if (map != null) {
+                for (attributes in map) {
+                    pickyBundle.putString(attributes.key, attributes.value.toString())
+                }
             }
         }
 

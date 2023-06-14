@@ -142,6 +142,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
 
     @Test
     fun testPaymentInfoCommerceEvent() {
+        val commerceCustomAttributes = mapOf(
+            "event::country" to "US"
+        )
         val event = CommerceEvent.Builder(
             Product.CHECKOUT_OPTION,
             Product.Builder("asdv", "asdv", 1.3).build()
@@ -152,10 +155,12 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             )
             .addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4_PAYMENT_TYPE, "visa")
             .build()
+        event.customAttributes = commerceCustomAttributes
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
         TestCase.assertEquals("add_payment_info", firebaseSdk.loggedEvents[0].key)
         TestCase.assertEquals("visa", firebaseSdk.loggedEvents[0].value.getString("payment_type"))
+        TestCase.assertEquals("US", firebaseSdk.loggedEvents[0].value.getString("event__country"))
     }
 
     @Test
@@ -335,7 +340,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             "test21" to "parameter",
             "test22" to "parameter",
             "test23" to "parameter",
-            "test24" to "parameter"
+            "event::country" to "US"
         )
         val testTruncatedAttributes = mapOf(
             "test1" to "parameter",
@@ -361,7 +366,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             "test21" to "parameter",
             "test22" to "parameter",
             "test23" to "parameter",
-            "test24" to "parameter",
+            "event::country" to "US",
             "z1" to "parameter",
             "z2" to "parameter",
             "z3" to "parameter",
@@ -391,7 +396,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             "test21" to "parameter",
             "test22" to "parameter",
             "test23" to "parameter",
-            "test24" to "parameter",
+            "event__country" to "US",
             "currency" to "USD"
         )
         val event = CommerceEvent.Builder(
@@ -416,31 +421,6 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             firebaseSdk.loggedEvents[0].value.size()
         )
         firebaseSdk.clearLoggedEvents()
-//
-//        MPProduct *product1 = [[MPProduct alloc] initWithName:@"William Hartnell" sku:@"1who" quantity:@1 price:@42.0];
-//        MPProduct *product2 = [[MPProduct alloc] initWithName:@"Patrick Troughton" sku:@"2who" quantity:@1 price:@42.0];
-//        MPProduct *product3 = [[MPProduct alloc] initWithName:@"Jon Pertwee" sku:@"3who" quantity:@1 price:@42.0];
-//        MPProduct *product4 = [[MPProduct alloc] initWithName:@"Tom Baker" sku:@"4who" quantity:@1 price:@42.0];
-//        MPProduct *product5 = [[MPProduct alloc] initWithName:@"Peter Davison" sku:@"5who" quantity:@1 price:@42.0];
-//        MPProduct *product6 = [[MPProduct alloc] initWithName:@"Colin Baker" sku:@"6who" quantity:@1 price:@42.0];
-//        MPProduct *product7 = [[MPProduct alloc] initWithName:@"Sylvester McCoy" sku:@"7who" quantity:@1 price:@42.0];
-//        MPProduct *product8 = [[MPProduct alloc] initWithName:@"Paul McGann" sku:@"8who" quantity:@1 price:@42.0];
-//        MPProduct *product9 = [[MPProduct alloc] initWithName:@"Christopher Eccleston" sku:@"9who" quantity:@1 price:@42.0];
-//        MPProduct *product10 = [[MPProduct alloc] initWithName:@"David Tennant" sku:@"10who" quantity:@1 price:@42.0];
-//        MPProduct *product11 = [[MPProduct alloc] initWithName:@"Matt Smith" sku:@"11who" quantity:@1 price:@42.0];
-//        MPProduct *product12 = [[MPProduct alloc] initWithName:@"Peter Capaldi" sku:@"12who" quantity:@1 price:@42.0];
-//        MPProduct *product13 = [[MPProduct alloc] initWithName:@"Jodie Whittaker" sku:@"13who" quantity:@1 price:@42.0];
-//
-//        MPCommerceEvent *purchaseEvent = [[MPCommerceEvent alloc] initWithAction:MPCommerceEventActionPurchase];
-//        purchaseEvent.products = @[product1, product2, product3, product4, product5, product6, product7, product8, product9, product10, product11, product12, product13];
-//
-//        parameters = [exampleKit getParameterForCommerceEvent:purchaseEvent];
-//        XCTAssertEqual([parameters count], 2);
-//        XCTAssertEqual([parameters[@"items"] count], 13);
-//        XCTAssertTrue([parameters[@"items"][0] count] <= 10);
-//
-//        execStatus = [exampleKit logBaseEvent:purchaseEvent];
-//        XCTAssertTrue(execStatus.success);
     }
 
     @Test
