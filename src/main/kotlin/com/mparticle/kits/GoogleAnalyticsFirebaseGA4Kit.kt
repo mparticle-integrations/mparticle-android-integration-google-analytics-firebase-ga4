@@ -592,12 +592,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     }
 
     fun standardizeName(nameIn: String?, event: Boolean): String? {
-
         var name = nameIn ?: return invalidGA4Key
-
-        if (clientStandardizationCallback != null) {
-            name = clientStandardizationCallback!!.nameStandardization(name)
-        }
+        clientStandardizationCallback?.let{ name = it. nameStandardization(name) }
 
         if (event) {
             name = name.replace("[^a-zA-Z0-9_]".toRegex(), "_")
