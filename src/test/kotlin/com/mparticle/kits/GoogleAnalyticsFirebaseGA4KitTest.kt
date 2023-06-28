@@ -312,6 +312,24 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             val empty = kitInstance.standardizeName(emptyString, true)
             TestCase.assertEquals("invalid_ga4_key", empty)
         }
+
+        var callback = object : GoogleAnalyticsFirebaseGA4Kit.MPClientStandardization {
+            override fun nameStandardization(name: String): String { return "test" }
+        }
+
+        kitInstance.setClientStandardizationCallback(callback)
+
+        val clientTestStrings = arrayOf(
+            "this",
+            "is",
+            "not",
+            "a",
+            "test"
+        )
+        for (clientString in clientTestStrings) {
+            val client = kitInstance.standardizeName(clientString, true)
+            TestCase.assertEquals("test", client)
+        }
     }
 
     @Test

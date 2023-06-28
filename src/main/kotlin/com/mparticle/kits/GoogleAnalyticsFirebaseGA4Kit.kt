@@ -23,6 +23,8 @@ import java.math.BigDecimal
 
 class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventListener,
     IdentityListener, CommerceListener, KitIntegration.UserAttributeListener {
+    private var clientStandardizationCallback: MPClientStandardization? = null
+
     override fun getName(): String = KIT_NAME
 
     @Throws(IllegalArgumentException::class)
@@ -33,6 +35,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         Logger.info("$name Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work")
         updateInstanceIDIntegration()
         return null
+    }
+
+    open fun setClientStandardizationCallback(standardizationCallback: MPClientStandardization) {
+        clientStandardizationCallback = standardizationCallback
     }
 
     override fun setOptOut(b: Boolean): List<ReportingMessage> = emptyList()
@@ -586,8 +592,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     }
 
     fun standardizeName(nameIn: String?, event: Boolean): String? {
-
         var name = nameIn ?: return invalidGA4Key
+        clientStandardizationCallback?.let{ name = it. nameStandardization(name) }
 
         if (event) {
             name = name.replace("[^a-zA-Z0-9_]".toRegex(), "_")
@@ -692,4 +698,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val USD = "USD"
     }
 
+    public interface MPClientStandardization {
+        fun nameStandardization(name: String): String;
+    }
 }
