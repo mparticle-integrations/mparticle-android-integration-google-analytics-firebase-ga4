@@ -27,6 +27,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
     override fun getName(): String = KIT_NAME
 
+    override fun getInstance(): GoogleAnalyticsFirebaseGA4Kit? {
+        return this
+    }
+
     @Throws(IllegalArgumentException::class)
     public override fun onKitCreate(
         map: Map<String, String>,
