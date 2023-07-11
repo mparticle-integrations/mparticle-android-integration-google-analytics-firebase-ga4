@@ -23,8 +23,6 @@ import java.math.BigDecimal
 
 class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventListener,
     IdentityListener, CommerceListener, KitIntegration.UserAttributeListener {
-    private var clientStandardizationCallback: MPClientStandardization? = null
-
     override fun getName(): String = KIT_NAME
 
     @Throws(IllegalArgumentException::class)
@@ -35,10 +33,6 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         Logger.info("$name Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work")
         updateInstanceIDIntegration()
         return null
-    }
-
-    open fun setClientStandardizationCallback(standardizationCallback: MPClientStandardization) {
-        clientStandardizationCallback = standardizationCallback
     }
 
     override fun setOptOut(b: Boolean): List<ReportingMessage> = emptyList()
@@ -663,6 +657,13 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     }
 
     companion object {
+        private var clientStandardizationCallback: MPClientStandardization? = null
+
+        @JvmStatic
+        fun setClientStandardizationCallback(standardizationCallback: MPClientStandardization?) {
+            clientStandardizationCallback = standardizationCallback
+        }
+
         const val SHOULD_HASH_USER_ID = "hashUserId"
         const val FORWARD_REQUESTS_SERVER_SIDE = "forwardWebRequestsServerSide"
         const val EXTERNAL_USER_IDENTITY_TYPE = "externalUserIdentityType"

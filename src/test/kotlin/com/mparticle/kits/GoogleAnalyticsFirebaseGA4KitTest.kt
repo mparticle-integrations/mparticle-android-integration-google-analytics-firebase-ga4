@@ -3,7 +3,6 @@ package com.mparticle.kits
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
-import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.mparticle.MPEvent
 import com.mparticle.MParticle
@@ -58,6 +57,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         kitInstance.configuration =
             KitConfiguration.createKitConfiguration(JSONObject().put("id", "-1"))
         firebaseSdk = FirebaseAnalytics.getInstance(null)!!
+        GoogleAnalyticsFirebaseGA4Kit.setClientStandardizationCallback(null)
     }
 
     /**
@@ -317,7 +317,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             override fun nameStandardization(name: String): String { return "test" }
         }
 
-        kitInstance.setClientStandardizationCallback(callback)
+        GoogleAnalyticsFirebaseGA4Kit.setClientStandardizationCallback(callback)
 
         val clientTestStrings = arrayOf(
             "this",
@@ -330,6 +330,15 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             val client = kitInstance.standardizeName(clientString, true)
             TestCase.assertEquals("test", client)
         }
+
+        var callbackCheck = object : GoogleAnalyticsFirebaseGA4Kit.MPClientStandardization {
+            override fun nameStandardization(name: String): String { return name }
+        }
+
+        GoogleAnalyticsFirebaseGA4Kit.setClientStandardizationCallback(callbackCheck)
+
+        val client = kitInstance.standardizeName("clientString", true)
+        TestCase.assertEquals("clientString", client)
     }
 
     @Test
