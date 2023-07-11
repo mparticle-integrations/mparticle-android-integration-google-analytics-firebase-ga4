@@ -330,6 +330,15 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             val client = kitInstance.standardizeName(clientString, true)
             TestCase.assertEquals("test", client)
         }
+
+        var callbackCheck = object : GoogleAnalyticsFirebaseGA4Kit.MPClientStandardization {
+            override fun nameStandardization(name: String): String { return name }
+        }
+
+        GoogleAnalyticsFirebaseGA4Kit.setClientStandardizationCallback(callbackCheck)
+
+        val client = kitInstance.standardizeName("clientString", true)
+        TestCase.assertEquals("clientString", client)
     }
 
     @Test
