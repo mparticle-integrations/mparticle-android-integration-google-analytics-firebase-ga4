@@ -6,6 +6,7 @@ import android.net.Uri
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.mparticle.MPEvent
 import com.mparticle.MParticle
+import com.mparticle.MParticleOptions
 import com.mparticle.MParticleOptions.DataplanOptions
 import com.mparticle.commerce.CommerceEvent
 import com.mparticle.commerce.Product
@@ -22,6 +23,7 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import java.lang.ref.WeakReference
 import java.lang.reflect.Modifier
 import java.util.*
@@ -51,7 +53,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         val kitManager = KitManagerImpl(
             Mockito.mock(
                 Context::class.java
-            ), null, emptyCoreCallbacks, null
+            ), null, emptyCoreCallbacks, mock(MParticleOptions::class.java)
         )
         kitInstance.kitManager = kitManager
         kitInstance.configuration =
