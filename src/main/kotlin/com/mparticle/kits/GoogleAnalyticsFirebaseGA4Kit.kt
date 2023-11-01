@@ -269,7 +269,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         task.addOnSuccessListener { appInstanceID ->
             if (!KitUtils.isEmpty(appInstanceID)) {
                 val integrationAttributes = HashMap<String, String>(1)
-                integrationAttributes[instanceIdIntegrationKey] = appInstanceID
+                integrationAttributes[instanceIdIntegrationKey] = appInstanceID!!
                 setIntegrationAttributes(integrationAttributes)
             }
         }
