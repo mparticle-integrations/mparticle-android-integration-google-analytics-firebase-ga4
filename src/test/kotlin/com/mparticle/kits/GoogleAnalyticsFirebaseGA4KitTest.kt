@@ -290,7 +290,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         TestCase.assertTrue(justFine.startsWith(sanitized))
 
         val tooLong =
-            "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890"
+            "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890"
         sanitized = kitInstance.standardizeName(tooLong, true).toString()
         TestCase.assertEquals(40, sanitized.length)
         TestCase.assertTrue(tooLong.startsWith(sanitized))
@@ -298,7 +298,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         TestCase.assertEquals(24, sanitized.length)
         TestCase.assertTrue(tooLong.startsWith(sanitized))
         sanitized = kitInstance.standardizeValue(tooLong, true)
-        TestCase.assertEquals(100, sanitized.length)
+        TestCase.assertEquals(500, sanitized.length)
         TestCase.assertTrue(tooLong.startsWith(sanitized))
         sanitized = kitInstance.standardizeValue(tooLong, false)
         TestCase.assertEquals(36, sanitized.length)
