@@ -688,8 +688,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private val forbiddenPrefixes = arrayOf("google_", "firebase_", "ga_")
         private const val eventMaxLength = 40
         private const val userAttributeMaxLength = 24
+        // Following limits are based off Google Analytics 360 limits, docs here "https://support.google.com/analytics/answer/11202874?sjid=14644072134282618832-NA#limits"
         private const val eventValMaxLength = 500
         private const val userAttributeValMaxLength = 36
+        // Following limits are based off Google Analytics 360 limits, docs here "https://support.google.com/analytics/answer/11202874?sjid=14644072134282618832-NA#limits"
         private const val eventMaxParameterProperty = 100
         private const val itemMaxParameter = 25
         private const val invalidGA4Key = "invalid_ga4_key"
