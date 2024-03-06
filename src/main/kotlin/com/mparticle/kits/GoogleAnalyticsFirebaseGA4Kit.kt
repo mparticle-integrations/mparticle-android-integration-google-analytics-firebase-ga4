@@ -439,11 +439,21 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         products?.let {
             val bundles = arrayOfNulls<Bundle>(products.size)
             for ((i, product) in products.withIndex()) {
-                val bundle = getBundle(product)
-                bundles[i] = bundle.bundle
+                val bundle = getHashmap(product)
+                val bundleSize = bundle.size
+                if (bundleSize > itemMaxParameter) {
+                    val additionalParameterSize = bundleSize - itemMaxParameter
+                    val keysToRemove = bundle
+                        .keys
+                        .sortedWith(String.CASE_INSENSITIVE_ORDER)
+                        .takeLast(additionalParameterSize)
+                    keysToRemove.forEach { key ->
+                        bundle.remove(key)
+                    }
+                }
+                bundles[i] = hashMapToBundle(bundle).bundle
             }
-            return products.map { getBundle(it).bundle }.toTypedArray()
-
+            return products.map { hashMapToBundle(getHashmap(it)).bundle }.toTypedArray()
         }
         return arrayOf()
     }
@@ -465,13 +475,26 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
     }
 
-    private fun getBundle(product: Product): PickyBundle {
-        return PickyBundle()
-            .putLong(FirebaseAnalytics.Param.QUANTITY, product.quantity.toLong())
-            .putString(FirebaseAnalytics.Param.ITEM_ID, product.sku)
-            .putString(FirebaseAnalytics.Param.ITEM_NAME, product.name)
-            .putString(FirebaseAnalytics.Param.ITEM_CATEGORY, product.category)
-            .putDouble(FirebaseAnalytics.Param.PRICE, product.unitPrice)
+    private fun hashMapToBundle(hashMap: HashMap<String, Any>): PickyBundle {
+        val bundle = PickyBundle()
+        for ((key, value) in hashMap) {
+            when (value) {
+                is String -> bundle.putString(key, value)
+                is Int -> bundle.putInt(key, value)
+                is Double -> bundle.putDouble(key, value)
+                is Long -> bundle.putLong(key, value)
+            }
+        }
+        return bundle
+    }
+
+    private fun getHashmap(product: Product): HashMap<String, Any> {
+        return hashMapOf<String, Any>().apply {
+            put(FirebaseAnalytics.Param.QUANTITY, product.quantity.toLong())
+            put(FirebaseAnalytics.Param.ITEM_ID, product.sku)
+            put(FirebaseAnalytics.Param.ITEM_NAME, product.name)
+            product.category?.let { put(FirebaseAnalytics.Param.ITEM_CATEGORY, it) }
+        }
     }
 
     private fun getValue(commerceEvent: CommerceEvent): Double? {
@@ -568,7 +591,18 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                 attributeCopy[it] = standardizeValue(value, event)
             }
         }
+        limitAttributes(attributeCopy, eventMaxParameterProperty)
         return attributeCopy
+    }
+
+    private fun limitAttributes(attributeCopy: HashMap<String, String>, maxCount: Int) {
+        if (!attributeCopy.isNullOrEmpty() && attributeCopy.size > maxCount) {
+            val dictionaryKeys = ArrayList(attributeCopy.keys)
+            dictionaryKeys.sortWith(String.CASE_INSENSITIVE_ORDER)
+            for (i in maxCount until dictionaryKeys.size) {
+                attributeCopy.remove(dictionaryKeys[i])
+            }
+        }
     }
 
     fun standardizeValue(valueIn: String?, event: Boolean): String {
