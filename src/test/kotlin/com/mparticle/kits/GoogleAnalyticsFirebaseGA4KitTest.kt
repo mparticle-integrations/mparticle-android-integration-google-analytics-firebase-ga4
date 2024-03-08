@@ -20,11 +20,13 @@ import junit.framework.TestCase
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import java.lang.ref.WeakReference
+import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.util.*
 
@@ -450,6 +452,90 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             firebaseSdk.loggedEvents[0].value.size()
         )
         firebaseSdk.clearLoggedEvents()
+    }
+
+    @Test
+    fun testStandardizeAttributes() {
+        val attributeCopy = hashMapOf(
+            "test" to "test",
+            "test1" to "test1",
+            "test2" to "test2",
+            "test3" to "test4",
+            "test5" to "test5"
+        )
+        val eventMaxParameterProperty = 3
+        val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
+            "limitAttributes",
+            HashMap::class.java,
+            Int::class.javaPrimitiveType
+        )
+        method.isAccessible = true
+
+        method.invoke(kitInstance, attributeCopy, eventMaxParameterProperty)
+        Assert.assertEquals(eventMaxParameterProperty, attributeCopy.size)
+    }
+    @Test
+    fun testStandardizeAttributes_attribute_isNull() {
+        val attributeCopy = HashMap<String, String>()
+
+        val eventMaxParameterProperty = 3
+        val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
+            "limitAttributes",
+            HashMap::class.java,
+            Int::class.javaPrimitiveType
+        )
+        method.isAccessible = true
+        method.invoke(kitInstance, null, eventMaxParameterProperty)
+        Assert.assertEquals(0, attributeCopy.size)
+    }
+
+    @Test
+    fun testStandardizeAttributes_attribute_empty() {
+        val attributeCopy = HashMap<String, String>()
+        val eventMaxParameterProperty = 3
+        val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
+            "limitAttributes",
+            HashMap::class.java,
+            Int::class.javaPrimitiveType
+        )
+        method.isAccessible = true
+        method.invoke(kitInstance, attributeCopy, eventMaxParameterProperty)
+        Assert.assertEquals(0, attributeCopy.size)
+    }
+
+    @Test
+    fun testStandardizeAttributes_attribute_less_than_max_size() {
+        val attributeCopy = hashMapOf(
+            "test" to "test",
+            "test1" to "test1",
+        )
+        val eventMaxParameterProperty = 3
+        val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
+            "limitAttributes",
+            HashMap::class.java,
+            Int::class.javaPrimitiveType
+        )
+        method.isAccessible = true
+        method.invoke(kitInstance, attributeCopy, eventMaxParameterProperty)
+        Assert.assertEquals(2, attributeCopy.size)
+    }
+
+    @Test
+    fun testStandardizeAttributes_attribute_equal_to_max_size() {
+        val attributeCopy = hashMapOf(
+            "test" to "test",
+            "test1" to "test1",
+            "test2" to "test4",
+        )
+        val eventMaxParameterProperty = 3
+        val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
+            "limitAttributes",
+            HashMap::class.java,
+            Int::class.javaPrimitiveType
+        )
+        method.isAccessible = true
+        method.invoke(kitInstance, attributeCopy, eventMaxParameterProperty)
+        Assert.assertEquals(eventMaxParameterProperty, attributeCopy.size)
     }
 
     @Test
