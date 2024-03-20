@@ -1,25 +1,25 @@
 package com.mparticle.kits
 
-import com.mparticle.kits.KitIntegration.IdentityListener
-import com.mparticle.kits.KitIntegration.CommerceListener
-import kotlin.Throws
-import java.lang.IllegalArgumentException
-import java.lang.Exception
-import com.mparticle.MPEvent
 import android.content.Context
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.mparticle.commerce.CommerceEvent
-import com.mparticle.commerce.Promotion
-import com.mparticle.commerce.Product
-import com.mparticle.identity.MParticleUser
-import java.util.HashMap
+import com.mparticle.MPEvent
 import com.mparticle.MParticle
 import com.mparticle.MParticle.EventType
 import com.mparticle.UserAttributeListener
+import com.mparticle.commerce.CommerceEvent
+import com.mparticle.commerce.Product
+import com.mparticle.commerce.Promotion
 import com.mparticle.consent.ConsentState
+import com.mparticle.identity.MParticleUser
 import com.mparticle.internal.Logger
+import com.mparticle.kits.KitIntegration.CommerceListener
+import com.mparticle.kits.KitIntegration.IdentityListener
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.math.BigDecimal
+import java.util.EnumMap
 
 class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventListener,
     IdentityListener, CommerceListener, KitIntegration.UserAttributeListener {
@@ -31,6 +31,9 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         context: Context
     ): List<ReportingMessage>? {
         Logger.info("$name Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work")
+        currentUser?.consentState?.let {
+            setConsent(currentUser.consentState)
+        }
         updateInstanceIDIntegration()
         return null
     }
@@ -571,11 +574,116 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         return false
     }
 
+    private fun parseToNestedMap(jsonString: String): Map<String, Any> {
+        val topLevelMap = mutableMapOf<String, Any>()
+
+        val jsonObject = JSONObject(jsonString)
+
+        for (key in jsonObject.keys()) {
+            val value = jsonObject.get(key)
+            if (value is JSONObject) {
+                topLevelMap[key] = parseToNestedMap(value.toString())
+            } else {
+                topLevelMap[key] = value
+            }
+        }
+
+        return topLevelMap
+    }
+
+    private fun searchKeyInNestedMap(map: Map<*, *>, key: Any): Any? {
+        for ((mapKey, mapValue) in map) {
+            if (mapKey.toString().equals(key.toString(), ignoreCase = true)) {
+                return mapValue
+            }
+            if (mapValue is Map<*, *>) {
+                val foundValue = searchKeyInNestedMap(mapValue, key)
+                if (foundValue != null) {
+                    return foundValue
+                }
+            }
+        }
+        return null
+    }
+
     override fun onConsentStateUpdated(
         consentState: ConsentState,
         consentState1: ConsentState,
         filteredMParticleUser: FilteredMParticleUser
     ) {
+        setConsent(consentState1)
+    }
+
+    private fun setConsent(consentState: ConsentState) {
+        val consentMap: MutableMap<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus> =
+            EnumMap(
+                FirebaseAnalytics.ConsentType::class.java
+            )
+        googleConsentMapSettings.forEach { it ->
+            val mpConsentSetting = settings[it.value]
+            if (!mpConsentSetting.isNullOrEmpty()) {
+                if (mpConsentSetting == GoogleConsentValues.GRANTED.values) {
+                    consentMap[it.key] = FirebaseAnalytics.ConsentStatus.GRANTED
+                } else if (mpConsentSetting == GoogleConsentValues.DENIED.values) {
+                    consentMap[it.key] = FirebaseAnalytics.ConsentStatus.DENIED
+                }
+            }
+        }
+
+        val clientConsentSettings = parseToNestedMap(consentState.toString())
+
+        parseConsentMapping(settings[consentMappingSDK]).forEach { currentConsent ->
+
+            val isConsentAvailable =
+                searchKeyInNestedMap(clientConsentSettings, key = currentConsent.key)
+
+            if (isConsentAvailable != null) {
+                val isConsentGranted: Boolean =
+                    JSONObject(isConsentAvailable.toString()).opt("consented") as Boolean
+                val consentStatus =
+                    if (isConsentGranted) FirebaseAnalytics.ConsentStatus.GRANTED else FirebaseAnalytics.ConsentStatus.DENIED
+
+
+                when (currentConsent.value) {
+                    "ad_storage" -> consentMap[FirebaseAnalytics.ConsentType.AD_STORAGE] =
+                        consentStatus
+
+                    "ad_user_data" -> consentMap[FirebaseAnalytics.ConsentType.AD_USER_DATA] =
+                        consentStatus
+
+                    "ad_personalization" -> consentMap[FirebaseAnalytics.ConsentType.AD_PERSONALIZATION] =
+                        consentStatus
+
+                    "analytics_storage" -> consentMap[FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE] =
+                        consentStatus
+                }
+            }
+        }
+        if (consentMap.isNotEmpty()) {
+            FirebaseAnalytics.getInstance(context).setConsent(consentMap)
+        }
+    }
+    private fun parseConsentMapping(json: String?): Map<String, String> {
+        if (json.isNullOrEmpty()) {
+            return emptyMap()
+        }
+        val jsonWithFormat = json.replace("\\", "")
+
+        return try {
+            JSONArray(jsonWithFormat)
+                .let { jsonArray ->
+                    (0 until jsonArray.length())
+                        .associate {
+                            val jsonObject = jsonArray.getJSONObject(it)
+                            val map = jsonObject.getString("map")
+                            val value = jsonObject.getString("value")
+                            map to value
+                        }
+                }
+        } catch (jse: JSONException) {
+            Logger.warning(jse, "parsing error")
+            emptyMap()
+        }
     }
 
     private fun standardizeAttributes(
@@ -733,6 +841,19 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val CURRENCY_FIELD_NOT_SET =
             "Currency field required by Firebase was not set, defaulting to 'USD'"
         private const val USD = "USD"
+        //Constants for Read Consent
+        private const val consentMappingSDK = "consentMappingSDK"
+        enum class GoogleConsentValues(val values: String) {
+            GRANTED("Granted"),
+            DENIED("Denied")
+        }
+
+        val googleConsentMapSettings = mapOf(
+            FirebaseAnalytics.ConsentType.AD_STORAGE to "defaultAdStorageConsentSDK",
+            FirebaseAnalytics.ConsentType.AD_USER_DATA to "defaultAdUserDataConsentSDK",
+            FirebaseAnalytics.ConsentType.AD_PERSONALIZATION to "defaultAdPersonalizationConsentSDK",
+            FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE to "defaultAnalyticsStorageConsentSDK"
+        )
     }
 
     public interface MPClientStandardization {
