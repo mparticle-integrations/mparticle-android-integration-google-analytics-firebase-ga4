@@ -53,7 +53,6 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     lateinit var filteredMParticleUser: FilteredMParticleUser
 
 
-
     private var random = Random()
 
     @Before
@@ -233,13 +232,13 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         kitInstance.configuration =
             KitConfiguration.createKitConfiguration(JSONObject().put("as", map.toMutableMap()))
 
-        val marketingConsent = GDPRConsent.builder(true)
+        val performanceConsent = GDPRConsent.builder(true)
             .document("Test consent")
             .location("17 Cherry Tree Lane")
             .hardwareId("IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702")
             .build()
         val state = ConsentState.builder()
-            .addGDPRConsentState("Performance", marketingConsent)
+            .addGDPRConsentState("Performance", performanceConsent)
             .build()
         filteredMParticleUser = FilteredMParticleUser.getInstance(user, kitInstance)
 
@@ -273,14 +272,14 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         kitInstance.configuration =
             KitConfiguration.createKitConfiguration(JSONObject().put("as", map.toMutableMap()))
 
-        val marketingConsent = GDPRConsent.builder(false)
+        val performanceConsent = GDPRConsent.builder(false)
             .document("Test consent")
             .location("17 Cherry Tree Lane")
             .hardwareId("IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702")
             .build()
 
         val state = ConsentState.builder()
-            .addGDPRConsentState("Performance", marketingConsent)
+            .addGDPRConsentState("Performance", performanceConsent)
             .build()
         filteredMParticleUser = FilteredMParticleUser.getInstance(user, kitInstance)
 
@@ -493,6 +492,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
 
         TestCase.assertEquals(0, firebaseSdk.getConsentState().size)
     }
+
     @Test
     fun onConsentStateUpdatedTest_When_default_is_Unspecified() {
         val map = HashMap<String, String>()
@@ -534,7 +534,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         TestCase.assertEquals(2, firebaseSdk.getConsentState().size)
     }
 
-    fun  MutableMap<Any, Any>.getKeyByValue(inputKey: String): Any? {
+    fun MutableMap<Any, Any>.getKeyByValue(inputKey: String): Any? {
         for ((key, mapValue) in entries) {
             if (key.toString() == inputKey) {
                 return mapValue
@@ -544,8 +544,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     }
 
     @Test
-    fun testParseToNestedMap_When_JSON_Is_INVALID(){
-       var jsonInput="{'GDPR':{'marketing':'{:false,'timestamp':1711038269644:'Test consent','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}','performance':'{'consented':true,'timestamp':1711038269644,'document':'parental_consent_agreement_v2','location':'17 Cherry Tree Lan 3','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'},'CCPA':'{'consented':true,'timestamp':1711038269644,'document':'ccpa_consent_agreement_v3','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'}"
+    fun testParseToNestedMap_When_JSON_Is_INVALID() {
+        var jsonInput =
+            "{'GDPR':{'marketing':'{:false,'timestamp':1711038269644:'Test consent','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}','performance':'{'consented':true,'timestamp':1711038269644,'document':'parental_consent_agreement_v2','location':'17 Cherry Tree Lan 3','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'},'CCPA':'{'consented':true,'timestamp':1711038269644,'document':'ccpa_consent_agreement_v3','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'}"
 
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
             "parseToNestedMap",
@@ -557,8 +558,8 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     }
 
     @Test
-    fun testParseToNestedMap_When_JSON_Is_Empty(){
-        var jsonInput=""
+    fun testParseToNestedMap_When_JSON_Is_Empty() {
+        var jsonInput = ""
 
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
             "parseToNestedMap",
@@ -570,7 +571,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     }
 
     @Test
-    fun testSearchKeyInNestedMap_When_Input_Is_Empty_String(){
+    fun testSearchKeyInNestedMap_When_Input_Key_Is_Empty_String() {
         val map = mapOf(
             "GDPR" to true,
             "marketing" to mapOf(
@@ -581,29 +582,29 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             )
         )
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
-            "searchKeyInNestedMap",  Map::class.java,
+            "searchKeyInNestedMap", Map::class.java,
             Any::class.java
         )
         method.isAccessible = true
-       val result = method.invoke(kitInstance, map,"")
+        val result = method.invoke(kitInstance, map, "")
         Assert.assertEquals(null, result)
     }
 
     @Test
-    fun testSearchKeyInNestedMap_When_Input_Is_Empty_Map(){
+    fun testSearchKeyInNestedMap_When_Input_Is_Empty_Map() {
         val emptyMap: Map<String, Int> = emptyMap()
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
-            "searchKeyInNestedMap",  Map::class.java,
+            "searchKeyInNestedMap", Map::class.java,
             Any::class.java
         )
         method.isAccessible = true
-        val result = method.invoke(kitInstance, emptyMap,"two")
+        val result = method.invoke(kitInstance, emptyMap, "two")
         Assert.assertEquals(null, result)
     }
 
     @Test
-    fun testParseConsentMapping_When_Input_Is_Empty_Json(){
-        val emptyJson=""
+    fun testParseConsentMapping_When_Input_Is_Empty_Json() {
+        val emptyJson = ""
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
             "parseConsentMapping",
             String::class.java
@@ -614,8 +615,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     }
 
     @Test
-    fun testParseConsentMapping_When_Input_Is_Invalid_Json(){
-        var jsonInput="{'GDPR':{'marketing':'{:false,'timestamp':1711038269644:'Test consent','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}','performance':'{'consented':true,'timestamp':1711038269644,'document':'parental_consent_agreement_v2','location':'17 Cherry Tree Lan 3','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'},'CCPA':'{'consented':true,'timestamp':1711038269644,'document':'ccpa_consent_agreement_v3','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'}"
+    fun testParseConsentMapping_When_Input_Is_Invalid_Json() {
+        var jsonInput =
+            "{'GDPR':{'marketing':'{:false,'timestamp':1711038269644:'Test consent','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}','performance':'{'consented':true,'timestamp':1711038269644,'document':'parental_consent_agreement_v2','location':'17 Cherry Tree Lan 3','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'},'CCPA':'{'consented':true,'timestamp':1711038269644,'document':'ccpa_consent_agreement_v3','location':'17 Cherry Tree Lane','hardware_id':'IDFA:a5d934n0-232f-4afc-2e9a-3832d95zc702'}'}"
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
             "parseConsentMapping",
             String::class.java
@@ -626,7 +628,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
     }
 
     @Test
-    fun testParseConsentMapping_When_Input_Is_NULL(){
+    fun testParseConsentMapping_When_Input_Is_NULL() {
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
             "parseConsentMapping",
             String::class.java
@@ -831,7 +833,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         }
 
         var callback = object : GoogleAnalyticsFirebaseGA4Kit.MPClientStandardization {
-            override fun nameStandardization(name: String): String { return "test" }
+            override fun nameStandardization(name: String): String {
+                return "test"
+            }
         }
 
         GoogleAnalyticsFirebaseGA4Kit.setClientStandardizationCallback(callback)
@@ -849,7 +853,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         }
 
         var callbackCheck = object : GoogleAnalyticsFirebaseGA4Kit.MPClientStandardization {
-            override fun nameStandardization(name: String): String { return name }
+            override fun nameStandardization(name: String): String {
+                return name
+            }
         }
 
         GoogleAnalyticsFirebaseGA4Kit.setClientStandardizationCallback(callbackCheck)
@@ -987,6 +993,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         method.invoke(kitInstance, attributeCopy, eventMaxParameterProperty)
         Assert.assertEquals(eventMaxParameterProperty, attributeCopy.size)
     }
+
     @Test
     fun testStandardizeAttributes_attribute_isNull() {
         val attributeCopy = HashMap<String, String>()
