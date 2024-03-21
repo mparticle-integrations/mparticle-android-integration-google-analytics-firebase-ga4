@@ -40,8 +40,6 @@ import java.util.*
  *
  * @see [Testing documentation](http://d.android.com/tools/testing)
  */
-
-
 class GoogleAnalyticsFirebaseGA4KitTest {
     private lateinit var kitInstance: GoogleAnalyticsFirebaseGA4Kit
     private lateinit var firebaseSdk: FirebaseAnalytics
@@ -138,7 +136,6 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
     }
-
 
     @Test
     fun onConsentStateUpdatedTest() {
@@ -598,7 +595,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             Any::class.java
         )
         method.isAccessible = true
-        val result = method.invoke(kitInstance, emptyMap, "two")
+        val result = method.invoke(kitInstance, emptyMap, "1")
         Assert.assertEquals(null, result)
     }
 

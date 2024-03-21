@@ -31,8 +31,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         context: Context
     ): List<ReportingMessage>? {
         Logger.info("$name Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work")
-        val user = currentUser?.consentState
-        user?.let {
+        val userConsentState = currentUser?.consentState
+        userConsentState?.let {
             setConsent(currentUser.consentState)
         }
         updateInstanceIDIntegration()
@@ -632,9 +632,9 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         googleConsentMapSettings.forEach { it ->
             val mpConsentSetting = settings[it.value]
             if (!mpConsentSetting.isNullOrEmpty()) {
-                if (mpConsentSetting == GoogleConsentValues.GRANTED.values) {
+                if (mpConsentSetting == GoogleConsentValues.GRANTED.consentValue) {
                     consentMap[it.key] = FirebaseAnalytics.ConsentStatus.GRANTED
-                } else if (mpConsentSetting == GoogleConsentValues.DENIED.values) {
+                } else if (mpConsentSetting == GoogleConsentValues.DENIED.consentValue) {
                     consentMap[it.key] = FirebaseAnalytics.ConsentStatus.DENIED
                 }
             }
@@ -853,7 +853,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         private const val USD = "USD"
         //Constants for Read Consent
         private const val consentMappingSDK = "consentMappingSDK"
-        enum class GoogleConsentValues(val values: String) {
+        enum class GoogleConsentValues(val consentValue: String) {
             GRANTED("Granted"),
             DENIED("Denied")
         }
