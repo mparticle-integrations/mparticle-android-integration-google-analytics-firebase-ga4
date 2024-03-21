@@ -571,13 +571,21 @@ class GoogleAnalyticsFirebaseGA4KitTest {
 
     @Test
     fun testSearchKeyInNestedMap_When_Input_Is_Empty_String(){
-        val map =""
+        val map = mapOf(
+            "GDPR" to true,
+            "marketing" to mapOf(
+                "consented" to false,
+                "document" to mapOf(
+                    "timestamp" to 1711038269644
+                )
+            )
+        )
         val method: Method = GoogleAnalyticsFirebaseGA4Kit::class.java.getDeclaredMethod(
             "searchKeyInNestedMap",  Map::class.java,
             Any::class.java
         )
         method.isAccessible = true
-       val result = method.invoke(kitInstance, map,"a")
+       val result = method.invoke(kitInstance, map,"")
         Assert.assertEquals(null, result)
     }
 
