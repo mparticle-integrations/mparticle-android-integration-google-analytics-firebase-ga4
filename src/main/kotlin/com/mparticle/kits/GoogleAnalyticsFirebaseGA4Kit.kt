@@ -31,7 +31,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         context: Context
     ): List<ReportingMessage>? {
         Logger.info("$name Kit relies on a functioning instance of Firebase Analytics. If your Firebase Analytics instance is not configured properly, this Kit will not work")
-        currentUser?.consentState?.let {
+        val user = currentUser?.consentState
+        user?.let {
             setConsent(currentUser.consentState)
         }
         updateInstanceIDIntegration()
@@ -576,32 +577,41 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
 
     private fun parseToNestedMap(jsonString: String): Map<String, Any> {
         val topLevelMap = mutableMapOf<String, Any>()
+        try {
+            val jsonObject = JSONObject(jsonString)
 
-        val jsonObject = JSONObject(jsonString)
-
-        for (key in jsonObject.keys()) {
-            val value = jsonObject.get(key)
-            if (value is JSONObject) {
-                topLevelMap[key] = parseToNestedMap(value.toString())
-            } else {
-                topLevelMap[key] = value
+            for (key in jsonObject.keys()) {
+                val value = jsonObject.get(key)
+                if (value is JSONObject) {
+                    topLevelMap[key] = parseToNestedMap(value.toString())
+                } else {
+                    topLevelMap[key] = value
+                }
             }
+        } catch (e: Exception) {
+            Logger.error(e, "parsing error")
         }
-
         return topLevelMap
     }
 
     private fun searchKeyInNestedMap(map: Map<*, *>, key: Any): Any? {
-        for ((mapKey, mapValue) in map) {
-            if (mapKey.toString().equals(key.toString(), ignoreCase = true)) {
-                return mapValue
-            }
-            if (mapValue is Map<*, *>) {
-                val foundValue = searchKeyInNestedMap(mapValue, key)
-                if (foundValue != null) {
-                    return foundValue
+        if (map.isNullOrEmpty()) {
+            return null
+        }
+        try {
+            for ((mapKey, mapValue) in map) {
+                if (mapKey.toString().equals(key.toString(), ignoreCase = true)) {
+                    return mapValue
+                }
+                if (mapValue is Map<*, *>) {
+                    val foundValue = searchKeyInNestedMap(mapValue, key)
+                    if (foundValue != null) {
+                        return foundValue
+                    }
                 }
             }
+        } catch (e: Exception) {
+            Logger.error(e, "Invalid Input")
         }
         return null
     }
