@@ -589,7 +589,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                 }
             }
         } catch (e: Exception) {
-            Logger.error(e, "parsing error")
+            Logger.error(
+                e,
+                "Google Analytics 4 kit was unable to parse the user's ConsentState, consent may not be set correctly on the Google Analytics SDK"
+            )
         }
         return topLevelMap
     }
@@ -611,7 +614,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                 }
             }
         } catch (e: Exception) {
-            Logger.error(e, "Invalid Input")
+            Logger.error(
+                e,
+                "The Google Analytics 4 kit threw an exception while searching for the configured consent purpose mapping in the current user's consent status."
+            )
         }
         return null
     }
@@ -691,7 +697,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                         }
                 }
         } catch (jse: JSONException) {
-            Logger.warning(jse, "parsing error")
+            Logger.error(
+                jse,
+                "The Google Analytics 4 kit threw an exception while searching for the configured consent purpose mapping in the current user's consent status."
+            )
             emptyMap()
         }
     }
