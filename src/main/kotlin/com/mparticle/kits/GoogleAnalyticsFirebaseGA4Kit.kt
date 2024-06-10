@@ -499,6 +499,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             put(FirebaseAnalytics.Param.ITEM_NAME, product.name)
             put(FirebaseAnalytics.Param.PRICE, product.unitPrice)
             product.category?.let { put(FirebaseAnalytics.Param.ITEM_CATEGORY, it) }
+            product.brand?.let { put(FirebaseAnalytics.Param.ITEM_BRAND, it) }
         }
     }
 
