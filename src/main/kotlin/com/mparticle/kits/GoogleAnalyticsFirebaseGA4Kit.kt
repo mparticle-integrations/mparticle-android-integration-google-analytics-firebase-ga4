@@ -119,7 +119,10 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         }
         commerceEvent.promotions?.let {
             for (promotion in it) {
-                bundle = getPromotionCommerceEventBundle(promotion).bundle
+                bundle = getPromotionCommerceEventBundle(
+                    promotion,
+                    commerceEvent.customAttributeStrings
+                ).bundle
                 instance.logEvent(eventName, bundle)
             }
         }
@@ -135,7 +138,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
             for (impression in it) {
                 bundle = getImpressionCommerceEventBundle(
                     impression.listName,
-                    impression.products
+                    impression.products,
+                    commerceEvent.customAttributeStrings
                 ).bundle
                 instance.logEvent(eventName, bundle)
             }
@@ -355,34 +359,64 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         return bundle
     }
 
-    private fun getPromotionCommerceEventBundle(promotion: Promotion?): PickyBundle {
-        val pickyBundle = PickyBundle()
-        return if (promotion == null) {
+    private fun getPromotionCommerceEventBundle(
+        promotion: Promotion?,
+        customAttributesStrings: Map<String, String>?
+    ): PickyBundle {
+        var pickyBundle = PickyBundle()
+        if (promotion == null) {
+            return pickyBundle
+        } else {
             pickyBundle
-        } else PickyBundle()
-            .putString(FirebaseAnalytics.Param.PROMOTION_ID, promotion.id)
-            .putString(
-                FirebaseAnalytics.Param.CREATIVE_NAME,
-                promotion.creative
-            )
-            .putString(
-                FirebaseAnalytics.Param.PROMOTION_NAME,
-                promotion.name
-            )
-            .putString(
-                FirebaseAnalytics.Param.CREATIVE_SLOT,
-                promotion.position
-            )
+                .putString(FirebaseAnalytics.Param.PROMOTION_ID, promotion.id)
+                .putString(
+                    FirebaseAnalytics.Param.CREATIVE_NAME,
+                    promotion.creative
+                )
+                .putString(
+                    FirebaseAnalytics.Param.PROMOTION_NAME,
+                    promotion.name
+                )
+                .putString(
+                    FirebaseAnalytics.Param.CREATIVE_SLOT,
+                    promotion.position
+                )
+
+            customAttributesStrings?.let { customAttributes ->
+                var map = standardizeAttributes(customAttributes, true)
+
+                if (map != null) {
+                    for (attributes in map) {
+                        pickyBundle.putString(attributes.key, attributes.value.toString())
+                    }
+                }
+            }
+
+            return pickyBundle
+        }
     }
 
     private fun getImpressionCommerceEventBundle(
         impressionKey: String?,
-        products: List<Product>?
+        products: List<Product>?,
+        customAttributesStrings: Map<String, String>?
     ): PickyBundle {
-        return PickyBundle()
+        var pickyBundle = PickyBundle()
             .putString(FirebaseAnalytics.Param.ITEM_LIST_ID, impressionKey)
             .putString(FirebaseAnalytics.Param.ITEM_LIST_NAME, impressionKey)
             .putBundleList(FirebaseAnalytics.Param.ITEMS, getProductBundles(products))
+
+        customAttributesStrings?.let { customAttributes ->
+            var map = standardizeAttributes(customAttributes, true)
+
+            if (map != null) {
+                for (attributes in map) {
+                    pickyBundle.putString(attributes.key, attributes.value.toString())
+                }
+            }
+        }
+
+        return pickyBundle
     }
 
     private fun getCommerceEventBundle(commerceEvent: CommerceEvent): PickyBundle {
