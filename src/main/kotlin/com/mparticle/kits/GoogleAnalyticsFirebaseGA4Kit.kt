@@ -364,9 +364,7 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
         customAttributesStrings: Map<String, String>?
     ): PickyBundle {
         var pickyBundle = PickyBundle()
-        if (promotion == null) {
-            return pickyBundle
-        } else {
+        if (promotion != null) {
             pickyBundle
                 .putString(FirebaseAnalytics.Param.PROMOTION_ID, promotion.id)
                 .putString(
@@ -391,9 +389,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
                     }
                 }
             }
-
-            return pickyBundle
         }
+        return pickyBundle
     }
 
     private fun getImpressionCommerceEventBundle(
