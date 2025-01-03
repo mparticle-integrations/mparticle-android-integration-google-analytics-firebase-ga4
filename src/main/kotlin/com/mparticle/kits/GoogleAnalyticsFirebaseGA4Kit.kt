@@ -63,8 +63,8 @@ class GoogleAnalyticsFirebaseGA4Kit : KitIntegration(), KitIntegration.EventList
     }
 
     override fun logScreen(
-            screenName: String,
-            screenAttributes: Map<String, String>?
+        screenName: String,
+        screenAttributes: Map<String, String>?
     ): List<ReportingMessage> {
         if (forwardRequestsServerSide()) {
             return emptyList()
