@@ -1104,18 +1104,18 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         val firebaseScreenViewEvent = firebaseSdk.loggedEvents[0]
         // even though we are passing one attribute, it should contain two including the screen_name
         TestCase.assertEquals(
-                2,
-                firebaseScreenViewEvent.value.size()
+            2,
+            firebaseScreenViewEvent.value.size()
         )
         // make sure the even name is correct with Firebase's constant SCREEN_NAME value
         TestCase.assertEquals(
-                "screen_view",
-                firebaseScreenViewEvent.key
+            "screen_view",
+            firebaseScreenViewEvent.key
         )
         // make sure that the Params include the screenName value
         TestCase.assertEquals(
-                "testScreenName",
-                firebaseScreenViewEvent.value.getString("screen_name")
+            "testScreenName",
+            firebaseScreenViewEvent.value.getString("screen_name")
         )
     }
 
