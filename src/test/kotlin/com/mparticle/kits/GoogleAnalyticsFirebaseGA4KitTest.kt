@@ -3,12 +3,14 @@ package com.mparticle.kits
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.mparticle.MPEvent
 import com.mparticle.MParticle
 import com.mparticle.MParticleOptions
 import com.mparticle.MParticleOptions.DataplanOptions
 import com.mparticle.commerce.CommerceEvent
+import com.mparticle.commerce.Impression
 import com.mparticle.commerce.Product
 import com.mparticle.commerce.Promotion
 import com.mparticle.commerce.TransactionAttributes
@@ -968,6 +970,35 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             firebaseSdk.loggedEvents[0].value.size()
         )
         firebaseSdk.clearLoggedEvents()
+    }
+
+    @Test
+    fun testProductCustomAttributes() {
+        val attributes = hashMapOf<String, String>()
+        attributes["productCustomAttribute"] = "potato"
+        attributes["store"] = "Target"
+        val product = Product.Builder("expensivePotato", "SKU123", 40.00)
+            .quantity(1.0)
+            .brand("LV")
+            .category("vegetable")
+            .customAttributes(attributes)
+            .build()
+
+        Impression("Suggested Products List", product).let {
+            CommerceEvent.Builder(it).build()
+        }.let {
+            kitInstance.logEvent(it)
+        }
+        val firebaseImpressionEvent = firebaseSdk.loggedEvents[0]
+        val firebaseProducts = firebaseImpressionEvent.value.get("items") as? Array<Bundle>
+        val firebaseProduct = firebaseProducts?.get(0)
+
+        // test the count of parameters for product, even though we only pass 2 custom attributes
+        // we expect the total to be 8 to include name, price, quantity, sku, brand ans category
+        TestCase.assertEquals(
+            8,
+            firebaseProduct?.size()
+        )
     }
 
     @Test
