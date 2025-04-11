@@ -981,6 +981,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
             .quantity(1.0)
             .brand("LV")
             .category("vegetable")
+            .position(4)
             .customAttributes(attributes)
             .build()
 
@@ -993,10 +994,10 @@ class GoogleAnalyticsFirebaseGA4KitTest {
         val firebaseProducts = firebaseImpressionEvent.value.get("items") as? Array<Bundle>
         val firebaseProduct = firebaseProducts?.get(0)
 
-        // test the count of parameters for product, even though we only pass 2 custom attributes
-        // we expect the total to be 8 to include name, price, quantity, sku, brand ans category
+        // test the count of parameters for product, even though we only pass 2 custom attributes we
+        // expect the total to be 9 to include name, price, quantity, sku, brand, category and position
         TestCase.assertEquals(
-            8,
+            9,
             firebaseProduct?.size()
         )
     }
