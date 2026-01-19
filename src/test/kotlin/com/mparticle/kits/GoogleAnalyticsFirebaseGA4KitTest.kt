@@ -706,9 +706,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
                     Product.CHECKOUT_OPTION,
                     Product.Builder("asdv", "asdv", 1.3).build(),
                 ).addCustomFlag(
-                    GoogleAnalyticsFirebaseGA4Kit.CF_GA4COMMERCE_EVENT_TYPE,
+                    "GA4.CommerceEventType",
                     FirebaseAnalytics.Event.ADD_SHIPPING_INFO,
-                ).addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4_SHIPPING_TIER, "overnight")
+                ).addCustomFlag("GA4.ShippingTier", "overnight")
                 .build()
         kitInstance.logEvent(event)
         TestCase.assertEquals(1, firebaseSdk.loggedEvents.size)
@@ -731,9 +731,9 @@ class GoogleAnalyticsFirebaseGA4KitTest {
                     Product.CHECKOUT_OPTION,
                     Product.Builder("asdv", "asdv", 1.3).build(),
                 ).addCustomFlag(
-                    GoogleAnalyticsFirebaseGA4Kit.CF_GA4COMMERCE_EVENT_TYPE,
+                    "GA4.CommerceEventType",
                     FirebaseAnalytics.Event.ADD_PAYMENT_INFO,
-                ).addCustomFlag(GoogleAnalyticsFirebaseGA4Kit.CF_GA4_PAYMENT_TYPE, "visa")
+                ).addCustomFlag("GA4.PaymentType", "visa")
                 .build()
         event.customAttributes = commerceCustomAttributes
         kitInstance.logEvent(event)
@@ -757,7 +757,7 @@ class GoogleAnalyticsFirebaseGA4KitTest {
                         Product.CHECKOUT_OPTION,
                         Product.Builder("asdv", "asdv", 1.3).build(),
                     ).addCustomFlag(
-                        GoogleAnalyticsFirebaseGA4Kit.CF_GA4COMMERCE_EVENT_TYPE,
+                        "GA4.CommerceEventType",
                         customEventType,
                     ).build()
             kitInstance.logEvent(event)
